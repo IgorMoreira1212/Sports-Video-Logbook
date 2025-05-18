@@ -7,9 +7,25 @@
 </div>
 
 <div class="rectangles-container">
-    <div class="vertical-rectangle" style="background-color: #d9302f;"></div>
-    <div class="vertical-rectangle" style="background-color: #0a8e45;"></div>
-    <div class="vertical-rectangle" style="background-color: #f9c01b;"></div>
-    <div class="vertical-rectangle" style="background-color: #f38d20;"></div>
-    <div class="vertical-rectangle" style="background-color: #a3a3a3;"></div>
+    <div class="vertical-rectangle" style="background-color: #d9302f;">
+        <img src="~/images/danca.png" alt="Dança" class="rectangle-image dance-img" />
+    </div>
+    <div class="vertical-rectangle" style="background-color: #0a8e45;">
+        <img src="~/images/futebol.png" alt="Futebol" class="rectangle-image soccer-img" />
+    </div>
+    <div class="vertical-rectangle" style="background-color: #f9c01b;">
+        <img src="~/images/corrida.png" alt="Corrida" class="rectangle-image running-img" />
+    </div>
+    <div class="vertical-rectangle" style="background-color: #f38d20;">
+        <img src="~/images/andebol.png" alt="Andebol" class="rectangle-image handball-img" />
+    </div>
+    <div class="vertical-rectangle" style="background-color: #a3a3a3;">
+        <img src="~/images/ginasio.png?v=@DateTime.Now.Ticks" alt="Ginásio" class="rectangle-image gym-img" />
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.body.classList.add('home-page');
+    </script>
+}
