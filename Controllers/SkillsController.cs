@@ -5,11 +5,13 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 using Sports_Video_Logbook.Data;
 using Sports_Video_Logbook.Models;
 
 namespace Sports_Video_Logbook.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class SkillsController : Controller
     {
         private readonly ApplicationDbContext _context;
