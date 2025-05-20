@@ -19,24 +19,25 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Sports_Video_Logbook.Data;
+using Sports_Video_Logbook.Models;
 
 namespace Sports_Video_Logbook.Areas.Identity.Pages.Account
 {
     public class RegisterModel : PageModel
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly IUserStore<IdentityUser> _userStore;
-        private readonly IUserEmailStore<IdentityUser> _emailStore;
+        private readonly SignInManager<Utilizador> _signInManager;
+        private readonly UserManager<Utilizador> _userManager;
+        private readonly IUserStore<Utilizador> _userStore;
+        private readonly IUserEmailStore<Utilizador> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
         private readonly ApplicationDbContext _dbcontext;
         private readonly RoleManager<IdentityRole> _roleManager;
 
         public RegisterModel(
-            UserManager<IdentityUser> userManager,
-            IUserStore<IdentityUser> userStore,
-            SignInManager<IdentityUser> signInManager,
+            UserManager<Utilizador> userManager,
+            IUserStore<Utilizador> userStore,
+            SignInManager<Utilizador> signInManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender,
             ApplicationDbContext dbcontext,
@@ -94,6 +95,9 @@ namespace Sports_Video_Logbook.Areas.Identity.Pages.Account
             [Required]
             public string Role { get; set; }
 
+            [Display(Name = "Número Mecanográfico")]
+            public string? Numero_Mecanografico { get; set; }
+
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
@@ -129,6 +133,18 @@ namespace Sports_Video_Logbook.Areas.Identity.Pages.Account
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
+                user.DataCriacao = DateTime.Now;
+
+                if (Input.Role == "Aluno")
+                {
+                    if (string.IsNullOrEmpty(Input.Numero_Mecanografico))
+                    {
+                        ModelState.AddModelError(string.Empty, "Número Mecanográfico is required for students.");
+                        ViewData["roles"] = _roleManager.Roles.ToList();
+                        return Page();
+                    }
+                    user.Numero_Mecanografico = Input.Numero_Mecanografico;
+                }
 
                 await _userStore.SetUserNameAsync(user, Input.UserName, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
@@ -173,27 +189,27 @@ namespace Sports_Video_Logbook.Areas.Identity.Pages.Account
             return Page();
         }
 
-        private IdentityUser CreateUser()
+        private Utilizador CreateUser()
         {
             try
             {
-                return Activator.CreateInstance<IdentityUser>();
+                return Activator.CreateInstance<Utilizador>();
             }
             catch
             {
-                throw new InvalidOperationException($"Can't create an instance of '{nameof(IdentityUser)}'. " +
-                    $"Ensure that '{nameof(IdentityUser)}' is not an abstract class and has a parameterless constructor, or alternatively " +
+                throw new InvalidOperationException($"Can't create an instance of '{nameof(Utilizador)}'. " +
+                    $"Ensure that '{nameof(Utilizador)}' is not an abstract class and has a parameterless constructor, or alternatively " +
                     $"override the register page in /Areas/Identity/Pages/Account/Register.cshtml");
             }
         }
 
-        private IUserEmailStore<IdentityUser> GetEmailStore()
+        private IUserEmailStore<Utilizador> GetEmailStore()
         {
             if (!_userManager.SupportsUserEmail)
             {
                 throw new NotSupportedException("The default UI requires a user store with email support.");
             }
-            return (IUserEmailStore<IdentityUser>)_userStore;
+            return (IUserEmailStore<Utilizador>)_userStore;
         }
     }
 }

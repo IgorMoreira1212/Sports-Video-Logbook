@@ -1,6 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Identity
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
+@using Sports_Video_Logbook.Models
+@inject SignInManager<Utilizador> SignInManager
+@inject UserManager<Utilizador> UserManager
 
 <ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))

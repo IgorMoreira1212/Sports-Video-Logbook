@@ -24,10 +24,15 @@
             </div>
             <div class="form-floating mb-3">
                 <label asp-for="Input.Role"></label>
-                <select asp-for="Input.Role" class="form-control" asp-items='new SelectList(ViewBag.roles, "Name", "Name", "Name")'>
+                <select asp-for="Input.Role" class="form-control" asp-items='new SelectList(ViewBag.roles, "Name", "Name", "Name")' onchange="toggleNumeroMecanografico()">
                     <option value=""></option>
                 </select>
                 <span asp-validation-for="Input.Role" class="text-danger"></span>
+            </div>
+            <div id="numeroMecanograficoDiv" class="form-floating mb-3" style="display: none;">
+                <input asp-for="Input.Numero_Mecanografico" class="form-control" autocomplete="off" placeholder="Número Mecanográfico" />
+                <label asp-for="Input.Numero_Mecanografico">Número Mecanográfico</label>
+                <span asp-validation-for="Input.Numero_Mecanografico" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
                 <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
@@ -76,4 +81,21 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        function toggleNumeroMecanografico() {
+            var roleSelect = document.getElementById('Input_Role');
+            var numeroMecanograficoDiv = document.getElementById('numeroMecanograficoDiv');
+            
+            if (roleSelect.value === 'Aluno') {
+                numeroMecanograficoDiv.style.display = 'block';
+                numeroMecanograficoDiv.querySelector('input').setAttribute('required', 'required');
+            } else {
+                numeroMecanograficoDiv.style.display = 'none';
+                numeroMecanograficoDiv.querySelector('input').removeAttribute('required');
+            }
+        }
+
+        // Call on page load to set initial state
+        document.addEventListener('DOMContentLoaded', toggleNumeroMecanografico);
+    </script>
 }
