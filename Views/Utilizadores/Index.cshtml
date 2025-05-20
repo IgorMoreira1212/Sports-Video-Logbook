@@ -1,0 +1,84 @@
+@model IEnumerable<Sports_Video_Logbook.Models.Utilizador>
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<Utilizador> UserManager
+@{
+    ViewData["Title"] = "Utilizadores";
+    var cargo = Context.Request.Query["cargo"].ToString();
+    var currentUserId = UserManager.GetUserId(User);
+    var allAdmins = await UserManager.GetUsersInRoleAsync("Admin");
+    var activeAdmins = allAdmins.Where(u => u.LockoutEnd == null || u.LockoutEnd <= DateTimeOffset.Now).ToList();
+}
+<div class="skills-card">
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger" style="margin-bottom: 18px;">@ViewBag.Error</div>
+    }
+    <div class="skills-header">
+        <form id="userSearchForm" method="get" action="/Utilizadores/Index" class="d-flex" style="width:100%;gap:10px;">
+            <input id="searchInput" name="search" type="text" class="skills-search" placeholder="Pesquisar" value="@Context.Request.Query["search"]" autocomplete="off" />
+            <select id="cargoSelect" name="cargo" class="skills-search" style="max-width:180px;">
+                <option value="Todos" selected="@(cargo == "Todos" ? "selected" : null)">Todos</option>
+                <option value="Aluno" selected="@(cargo == "Aluno" ? "selected" : null)">Aluno</option>
+                <option value="Professor" selected="@(cargo == "Professor" ? "selected" : null)">Professor</option>
+                <option value="Administrador" selected="@(cargo == "Administrador" ? "selected" : null)">Administrador</option>
+            </select>
+        </form>
+        <a asp-action="Create" class="skills-add-btn">ADICIONAR UTILIZADOR</a>
+    </div>
+    <table class="skills-table">
+        <thead>
+            <tr>
+                <th class="skills-th">Nome</th>
+                <th class="skills-th">UserName</th>
+                <th class="skills-th">Cargo</th>
+                <th class="skills-th skills-th-action">Ação</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var user in Model) {
+            var roles = await UserManager.GetRolesAsync(user);
+            bool isLocked = user.LockoutEnd != null && user.LockoutEnd > DateTimeOffset.Now;
+            bool isAdmin = roles.Contains("Admin");
+            bool isOnlyActiveAdmin = isAdmin && activeAdmins.Count == 1 && (user.LockoutEnd == null || user.LockoutEnd <= DateTimeOffset.Now);
+            bool isCurrentUser = user.Id == currentUserId;
+            string disableReason = isOnlyActiveAdmin ? "Não é possível desativar o único administrador ativo." : (isCurrentUser ? "Não pode desativar a sua própria conta." : null);
+            <tr class="skill-row">
+                <td class="skills-td">@user.Email</td>
+                <td class="skills-td">@user.UserName</td>
+                <td class="skills-td">@(roles.Count > 0 ? roles[0] : "-")</td>
+                <td class="skills-td skills-td-action">
+                    <form asp-action="AlternarEstado" asp-route-id="@user.Id" method="post" style="display:inline;">
+                        <button type="submit" class="skills-remove-btn">@(isLocked ? "ATIVAR" : "DESATIVAR")</button>
+                    </form>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+@section Scripts {
+<script>
+    // Debounce function
+    function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    }
+    // Submit on search input
+    const searchInput = document.getElementById('searchInput');
+    const cargoSelect = document.getElementById('cargoSelect');
+    const form = document.getElementById('userSearchForm');
+    if (searchInput) {
+        searchInput.addEventListener('input', debounce(function() {
+            form.submit();
+        }, 400));
+    }
+    if (cargoSelect) {
+        cargoSelect.addEventListener('change', function() {
+            form.submit();
+        });
+    }
+</script>
+} 
