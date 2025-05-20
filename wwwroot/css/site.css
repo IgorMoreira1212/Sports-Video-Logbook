@@ -907,4 +907,75 @@ a:hover {
     margin-right: auto;
     /* Remove qualquer float ou alinhamento lateral */
     float: none;
+}
+
+/* --- Access Denied Page Styles --- */
+.access-denied-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+    padding: 20px;
+}
+
+.access-denied-card {
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+    padding: 40px;
+    text-align: center;
+    max-width: 500px;
+    width: 100%;
+}
+
+.access-denied-icon {
+    font-size: 4rem;
+    color: #67432F;
+    margin-bottom: 20px;
+}
+
+.access-denied-card h1 {
+    color: #67432F;
+    font-size: 2rem;
+    margin-bottom: 20px;
+    font-family: Georgia, serif;
+}
+
+.access-denied-card p {
+    color: #666;
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.access-denied-btn {
+    display: inline-block;
+    background: #67432F;
+    color: white;
+    padding: 12px 30px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    margin-top: 20px;
+    transition: background 0.3s ease;
+}
+
+.access-denied-btn:hover {
+    background: #4a2f21;
+    color: white;
+}
+
+@media (max-width: 576px) {
+    .access-denied-card {
+        padding: 30px 20px;
+    }
+    .access-denied-icon {
+        font-size: 3rem;
+    }
+    .access-denied-card h1 {
+        font-size: 1.8rem;
+    }
+    .access-denied-card p {
+        font-size: 1rem;
+    }
 } 

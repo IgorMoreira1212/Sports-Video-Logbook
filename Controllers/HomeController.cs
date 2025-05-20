@@ -24,7 +24,14 @@ namespace Sports_Video_Logbook.Controllers
         {
             return View();
         }
+
         public IActionResult Skills()
+        {
+            return View();
+        }
+
+        [AllowAnonymous]
+        public IActionResult AccessDenied()
         {
             return View();
         }
