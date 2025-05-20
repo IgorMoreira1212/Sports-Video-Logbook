@@ -1,0 +1,29 @@
+@model Sports_Video_Logbook.Models.Utilizador
+@{
+    ViewData["Title"] = "Adicionar Utilizador";
+}
+<div class="skills-modal-bg">
+    <div class="skills-modal-card">
+        <form asp-action="Create" class="skills-modal-form" method="post">
+            <input asp-for="UserName" class="skills-modal-input" placeholder="UserName*" autocomplete="off" />
+            <span asp-validation-for="UserName" class="skills-modal-error"></span>
+            <input asp-for="Email" class="skills-modal-input" placeholder="Email*" autocomplete="off" />
+            <span asp-validation-for="Email" class="skills-modal-error"></span>
+            <input asp-for="Numero_Mecanografico" class="skills-modal-input" placeholder="Nº Mecanográfico" autocomplete="off" />
+            <span asp-validation-for="Numero_Mecanografico" class="skills-modal-error"></span>
+            <input name="password" type="password" class="skills-modal-input" placeholder="Password*" autocomplete="off" />
+            <select name="role" class="skills-modal-input">
+                <option value="Aluno">Aluno</option>
+                <option value="Professor">Professor</option>
+                <option value="Administrador">Administrador</option>
+            </select>
+            <div class="skills-modal-btns">
+                <button type="submit" class="skills-modal-submit">SUBMETER</button>
+                <a asp-action="Index" class="skills-modal-cancel">CANCELAR</a>
+            </div>
+        </form>
+    </div>
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} 

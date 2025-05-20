@@ -689,6 +689,10 @@ a:hover {
     margin-bottom: 18px;
     gap: 12px;
 }
+.skills-header form {
+    flex: 1 1 auto;
+    min-width: 0;
+}
 .skills-search {
     flex: 1;
     padding: 10px 16px;
@@ -978,4 +982,43 @@ a:hover {
     .access-denied-card p {
         font-size: 1rem;
     }
+}
+
+/* --- Customização para pesquisa de utilizadores --- */
+#searchInput {
+    border-radius: 8px 0 0 8px !important;
+    max-width: 380px;
+}
+#cargoSelect {
+    border-radius: 0 8px 8px 0 !important;
+    margin-right: 10px;
+    max-width: 150px;
+}
+.skills-add-btn[asp-action="Create"],
+.skills-header > a.skills-add-btn {
+    border-radius: 8px !important;
+    margin-left: 10px;
+    white-space: nowrap;
+    max-width: none;
+    min-width: 260px;
+    padding-left: 36px;
+    padding-right: 36px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+/* Centralizar colunas UserName e Cargo na tabela de utilizadores */
+.skills-table th:nth-child(2),
+.skills-table th:nth-child(3),
+.skills-table td:nth-child(2),
+.skills-table td:nth-child(3) {
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Barra de pesquisa arredondada de ambos os lados na página de skills */
+.skills-header .skills-search {
+    border-radius: 8px !important;
 } 
