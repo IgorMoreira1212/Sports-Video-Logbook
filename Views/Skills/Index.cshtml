@@ -1,35 +1,46 @@
 ﻿@model IEnumerable<Sports_Video_Logbook.Models.Skill>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Skills";
 }
 
-<h1>Index</h1>
+<div class="skills-card">
+    <div class="skills-header">
+        <input id="searchSkill" type="text" class="skills-search" placeholder="Pesquisar" />
+        <a asp-action="Create" class="skills-add-btn">ADICIONAR SKILL</a>
+    </div>
+    <table class="skills-table">
+        <thead>
+            <tr>
+                <th class="skills-th">Skill</th>
+                <th class="skills-th skills-th-action">Ação</th>
+            </tr>
+        </thead>
+        <tbody id="skillsList">
+        @foreach (var item in Model) {
+            <tr class="skill-row">
+                <td class="skills-td">@item.Nome</td>
+                <td class="skills-td skills-td-action">
+                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" style="display:inline;">
+                        <input type="hidden" name="Id" value="@item.Id" />
+                        <button type="submit" class="skills-remove-btn">REMOVER</button>
+                    </form>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Nome)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Nome)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+@section Scripts {
+<script>
+    document.getElementById('searchSkill').addEventListener('input', function() {
+        var filter = this.value.toLowerCase();
+        var rows = document.querySelectorAll('#skillsList .skill-row');
+        rows.forEach(function(row) {
+            var skill = row.querySelector('.skills-td').textContent.toLowerCase();
+            row.style.display = skill.includes(filter) ? '' : 'none';
+        });
+    });
+</script>
 }
-    </tbody>
-</table>

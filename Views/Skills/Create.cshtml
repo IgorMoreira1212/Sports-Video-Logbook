@@ -1,31 +1,20 @@
 ﻿@model Sports_Video_Logbook.Models.Skill
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Adicionar Skill";
 }
 
-<h1>Create</h1>
-
-<h4>Skill</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Nome" class="control-label"></label>
-                <input asp-for="Nome" class="form-control" />
-                <span asp-validation-for="Nome" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+<div class="skills-modal-bg">
+    <div class="skills-modal-card">
+        <form asp-action="Create" class="skills-modal-form">
+            <input asp-for="Nome" class="skills-modal-input" placeholder="Skill*" autocomplete="off" />
+            <span asp-validation-for="Nome" class="skills-modal-error"></span>
+            <div class="skills-modal-btns">
+                <button type="submit" class="skills-modal-submit">SUBMETER</button>
+                <a asp-action="Index" class="skills-modal-cancel">CANCELAR</a>
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {
