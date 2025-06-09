@@ -50,7 +50,13 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<Utilizador>>();
+    
+    // Primeiro criar os roles
     SeedRoles.Seed(roleManager);
+    
+    // Depois criar os utilizadores (precisa dos roles já criados)
+    SeedUsers.Seed(userManager);
 }
 
 // Configure the HTTP request pipeline.
