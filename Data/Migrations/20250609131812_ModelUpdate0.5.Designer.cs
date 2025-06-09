@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Sports_Video_Logbook.Data;
 
@@ -11,9 +12,11 @@ using Sports_Video_Logbook.Data;
 namespace Sports_Video_Logbook.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250609131812_ModelUpdate0.5")]
+    partial class ModelUpdate05
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,37 +24,6 @@ namespace Sports_Video_Logbook.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("InscricaoUC", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AlunoId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("TurmaNome")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("UCId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UCId");
-
-                    b.HasIndex("AlunoId", "UCId")
-                        .IsUnique();
-
-                    b.HasIndex("TurmaNome", "UCId");
-
-                    b.ToTable("InscricoesUC");
-                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -190,32 +162,6 @@ namespace Sports_Video_Logbook.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Sports_Video_Logbook.Models.AvaliacaoSkill", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Nota")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SkillId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SubmissaoTarefaId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SkillId");
-
-                    b.HasIndex("SubmissaoTarefaId");
-
-                    b.ToTable("AvaliacoesSkill");
-                });
-
             modelBuilder.Entity("Sports_Video_Logbook.Models.ProfessorUC", b =>
                 {
                     b.Property<string>("ProfessorId")
@@ -246,108 +192,6 @@ namespace Sports_Video_Logbook.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Skill");
-                });
-
-            modelBuilder.Entity("Sports_Video_Logbook.Models.SubmissaoTarefa", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AlunoId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("DataSubmissao")
-                        .HasColumnType("datetime2");
-
-                    b.Property<double?>("NotaFinal")
-                        .HasColumnType("float");
-
-                    b.Property<int>("TarefaId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Texto")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("VideoUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AlunoId");
-
-                    b.HasIndex("TarefaId");
-
-                    b.ToTable("SubmissoesTarefa");
-                });
-
-            modelBuilder.Entity("Sports_Video_Logbook.Models.Tarefa", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("Concluida")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("DataFim")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DataInicio")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Descricao")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ProfessorId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Titulo")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TurmaNome")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int?>("TurmaUCId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("UCId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProfessorId");
-
-                    b.HasIndex("UCId");
-
-                    b.HasIndex("TurmaNome", "TurmaUCId");
-
-                    b.ToTable("Tarefas");
-                });
-
-            modelBuilder.Entity("Sports_Video_Logbook.Models.TarefaSkill", b =>
-                {
-                    b.Property<int>("TarefaId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SkillId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Peso")
-                        .HasColumnType("int");
-
-                    b.HasKey("TarefaId", "SkillId");
-
-                    b.HasIndex("SkillId");
-
-                    b.ToTable("TarefaSkills");
                 });
 
             modelBuilder.Entity("Sports_Video_Logbook.Models.Turma", b =>
@@ -461,33 +305,6 @@ namespace Sports_Video_Logbook.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("InscricaoUC", b =>
-                {
-                    b.HasOne("Sports_Video_Logbook.Models.Utilizador", "Aluno")
-                        .WithMany()
-                        .HasForeignKey("AlunoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Sports_Video_Logbook.Models.UC", "UC")
-                        .WithMany()
-                        .HasForeignKey("UCId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Sports_Video_Logbook.Models.Turma", "Turma")
-                        .WithMany()
-                        .HasForeignKey("TurmaNome", "UCId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Aluno");
-
-                    b.Navigation("Turma");
-
-                    b.Navigation("UC");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -539,25 +356,6 @@ namespace Sports_Video_Logbook.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Sports_Video_Logbook.Models.AvaliacaoSkill", b =>
-                {
-                    b.HasOne("Sports_Video_Logbook.Models.Skill", "Skill")
-                        .WithMany()
-                        .HasForeignKey("SkillId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Sports_Video_Logbook.Models.SubmissaoTarefa", "SubmissaoTarefa")
-                        .WithMany("AvaliacoesSkills")
-                        .HasForeignKey("SubmissaoTarefaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Skill");
-
-                    b.Navigation("SubmissaoTarefa");
-                });
-
             modelBuilder.Entity("Sports_Video_Logbook.Models.ProfessorUC", b =>
                 {
                     b.HasOne("Sports_Video_Logbook.Models.Utilizador", "Professor")
@@ -577,67 +375,6 @@ namespace Sports_Video_Logbook.Data.Migrations
                     b.Navigation("UC");
                 });
 
-            modelBuilder.Entity("Sports_Video_Logbook.Models.SubmissaoTarefa", b =>
-                {
-                    b.HasOne("Sports_Video_Logbook.Models.Utilizador", "Aluno")
-                        .WithMany()
-                        .HasForeignKey("AlunoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Sports_Video_Logbook.Models.Tarefa", "Tarefa")
-                        .WithMany("Submissoes")
-                        .HasForeignKey("TarefaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Aluno");
-
-                    b.Navigation("Tarefa");
-                });
-
-            modelBuilder.Entity("Sports_Video_Logbook.Models.Tarefa", b =>
-                {
-                    b.HasOne("Sports_Video_Logbook.Models.Utilizador", "Professor")
-                        .WithMany()
-                        .HasForeignKey("ProfessorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Sports_Video_Logbook.Models.UC", "UC")
-                        .WithMany()
-                        .HasForeignKey("UCId");
-
-                    b.HasOne("Sports_Video_Logbook.Models.Turma", "Turma")
-                        .WithMany()
-                        .HasForeignKey("TurmaNome", "TurmaUCId");
-
-                    b.Navigation("Professor");
-
-                    b.Navigation("Turma");
-
-                    b.Navigation("UC");
-                });
-
-            modelBuilder.Entity("Sports_Video_Logbook.Models.TarefaSkill", b =>
-                {
-                    b.HasOne("Sports_Video_Logbook.Models.Skill", "Skill")
-                        .WithMany()
-                        .HasForeignKey("SkillId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Sports_Video_Logbook.Models.Tarefa", "Tarefa")
-                        .WithMany("TarefaSkills")
-                        .HasForeignKey("TarefaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Skill");
-
-                    b.Navigation("Tarefa");
-                });
-
             modelBuilder.Entity("Sports_Video_Logbook.Models.Turma", b =>
                 {
                     b.HasOne("Sports_Video_Logbook.Models.Utilizador", "Professor")
@@ -655,18 +392,6 @@ namespace Sports_Video_Logbook.Data.Migrations
                     b.Navigation("Professor");
 
                     b.Navigation("UC");
-                });
-
-            modelBuilder.Entity("Sports_Video_Logbook.Models.SubmissaoTarefa", b =>
-                {
-                    b.Navigation("AvaliacoesSkills");
-                });
-
-            modelBuilder.Entity("Sports_Video_Logbook.Models.Tarefa", b =>
-                {
-                    b.Navigation("Submissoes");
-
-                    b.Navigation("TarefaSkills");
                 });
 
             modelBuilder.Entity("Sports_Video_Logbook.Models.UC", b =>
