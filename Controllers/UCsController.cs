@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using Sports_Video_Logbook.Data;
 using Sports_Video_Logbook.Models;
 
@@ -13,10 +14,12 @@ namespace Sports_Video_Logbook.Controllers
     public class UCsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<Utilizador> _userManager;
 
-        public UCsController(ApplicationDbContext context)
+        public UCsController(ApplicationDbContext context, UserManager<Utilizador> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: UCs
@@ -52,32 +55,63 @@ namespace Sports_Video_Logbook.Controllers
         }
 
         // GET: UCs/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View();
+            var professores = await _userManager.GetUsersInRoleAsync("Professor");
+            
+            var viewModel = new CreateUCViewModel
+            {
+                ProfessoresDisponiveis = professores
+                    .Where(p => !string.IsNullOrEmpty(p.UserName) && !string.IsNullOrEmpty(p.Email))
+                    .Select(p => new SelectListItem
+                    {
+                        Value = p.Id,
+                        Text = $"{p.UserName} ({p.Email})"
+                    }).ToList()
+            };
+            
+            // Debug: verificar se temos professores
+            System.Diagnostics.Debug.WriteLine($"Found {professores.Count} professors in role");
+            System.Diagnostics.Debug.WriteLine($"Valid professors for select: {viewModel.ProfessoresDisponiveis.Count}");
+            
+            return View(viewModel);
         }
 
         // POST: UCs/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nome")] UC uC, int NumeroTurmas)
+        public async Task<IActionResult> Create(CreateUCViewModel viewModel)
         {
-            if (ModelState.IsValid && NumeroTurmas > 0)
+            if (ModelState.IsValid)
             {
-                // Adicionar a UC
-                _context.Add(uC);
+                // Verificar se temos professores suficientes
+                if (viewModel.ProfessoresIds.Count < viewModel.NumeroTurmas)
+                {
+                    ModelState.AddModelError("", "Deve selecionar pelo menos um professor para cada turma.");
+                    await CarregarProfessores(viewModel);
+                    return View(viewModel);
+                }
+
+                // Criar a UC
+                var uc = new UC
+                {
+                    Nome = viewModel.Nome,
+                    NumeroTurmas = viewModel.NumeroTurmas
+                };
+                
+                _context.Add(uc);
                 await _context.SaveChangesAsync();
 
-                // Criar as turmas baseadas no número especificado
-                for (int i = 1; i <= NumeroTurmas; i++)
+                // Criar as turmas com professores atribuídos
+                for (int i = 0; i < viewModel.NumeroTurmas; i++)
                 {
+                    var professorId = viewModel.ProfessoresIds[i % viewModel.ProfessoresIds.Count];
+                    
                     var turma = new Turma
                     {
-                        Nome = $"Turma {i}",
-                        UCId = uC.Id,
-                        ProfessorId = "" // Será definido posteriormente
+                        Nome = $"Turma {i + 1}",
+                        UCId = uc.Id,
+                        ProfessorId = professorId
                     };
                     _context.Turmas.Add(turma);
                 }
@@ -86,13 +120,22 @@ namespace Sports_Video_Logbook.Controllers
                 return RedirectToAction(nameof(Index));
             }
             
-            // Se NumeroTurmas não foi fornecido, adicionar erro ao ModelState
-            if (NumeroTurmas <= 0)
-            {
-                ModelState.AddModelError("NumeroTurmas", "Deve especificar o número de turmas.");
-            }
-            
-            return View(uC);
+            await CarregarProfessores(viewModel);
+            return View(viewModel);
+        }
+
+        private async Task CarregarProfessores(CreateUCViewModel viewModel)
+        {
+            var professores = await _userManager.GetUsersInRoleAsync("Professor");
+            viewModel.ProfessoresDisponiveis = professores
+                .Where(p => !string.IsNullOrEmpty(p.UserName) && !string.IsNullOrEmpty(p.Email))
+                .Select(p => new SelectListItem
+                {
+                    Value = p.Id,
+                    Text = $"{p.UserName} ({p.Email})"
+                }).ToList();
+                
+            System.Diagnostics.Debug.WriteLine($"CarregarProfessores: Found {professores.Count} professors, {viewModel.ProfessoresDisponiveis.Count} valid");
         }
 
         // GET: UCs/Edit/5

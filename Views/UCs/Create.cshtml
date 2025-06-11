@@ -1,4 +1,4 @@
-﻿@model Sports_Video_Logbook.Models.UC
+﻿@model Sports_Video_Logbook.Models.CreateUCViewModel
 
 @{
     ViewData["Title"] = "Adicionar UC";
@@ -6,10 +6,11 @@
 
 <div class="skills-modal-bg">
     <div class="skills-modal-card">
-        <form asp-action="Create" class="skills-modal-form" method="post">
+        <form asp-action="Create" class="skills-modal-form" method="post" id="ucForm">
             <input asp-for="Nome" class="skills-modal-input" placeholder="Nome da UC*" autocomplete="off" />
             <span asp-validation-for="Nome" class="skills-modal-error"></span>
-            <select name="NumeroTurmas" class="skills-modal-input">
+            
+            <select asp-for="NumeroTurmas" class="skills-modal-input" id="numeroTurmas" onchange="updateProfessoresSelects()">
                 <option value="">Nº Turmas*</option>
                 <option value="1">1</option>
                 <option value="2">2</option>
@@ -22,7 +23,22 @@
                 <option value="9">9</option>
                 <option value="10">10</option>
             </select>
-            <span class="skills-modal-error">@Html.ValidationMessage("NumeroTurmas")</span>
+            <span asp-validation-for="NumeroTurmas" class="skills-modal-error"></span>
+            
+            <div id="professoresContainer" style="display: none;">
+                <h4 style="margin: 15px 0 10px 0; color: #333;">Selecionar Professores para as Turmas:</h4>
+                @if (!Model.ProfessoresDisponiveis.Any())
+                {
+                    <div style="color: red; margin: 10px 0;">
+                        <strong>Aviso:</strong> Não há professores disponíveis no sistema. 
+                        Crie primeiro alguns utilizadores com o role "Professor" antes de criar UCs.
+                    </div>
+                }
+                <div id="professoresSelects"></div>
+            </div>
+            
+            <div asp-validation-summary="All" class="skills-modal-error"></div>
+            
             <div class="skills-modal-btns">
                 <button type="submit" class="skills-modal-submit">SUBMETER</button>
                 <a asp-action="Index" class="skills-modal-cancel">CANCELAR</a>
@@ -33,4 +49,71 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function updateProfessoresSelects() {
+            const numeroTurmas = document.getElementById('numeroTurmas').value;
+            const container = document.getElementById('professoresContainer');
+            const selectsDiv = document.getElementById('professoresSelects');
+            
+            if (!numeroTurmas || numeroTurmas <= 0) {
+                container.style.display = 'none';
+                selectsDiv.innerHTML = '';
+                return;
+            }
+            
+            container.style.display = 'block';
+            selectsDiv.innerHTML = '';
+            
+            // Criar array de professores de forma mais segura
+            const professoresOptions = [
+                @foreach(var prof in Model.ProfessoresDisponiveis)
+                {
+                    <text>{ value: '@prof.Value', text: '@Html.Raw(prof.Text.Replace("'", "\\'"))' },</text>
+                }
+            ];
+            
+            console.log('Professores disponíveis:', professoresOptions); // Debug
+            
+            for (let i = 0; i < numeroTurmas; i++) {
+                const selectDiv = document.createElement('div');
+                selectDiv.style.marginBottom = '10px';
+                
+                const label = document.createElement('label');
+                label.textContent = `Turma ${i + 1}:`;
+                label.style.display = 'block';
+                label.style.marginBottom = '5px';
+                label.style.fontWeight = 'bold';
+                
+                const select = document.createElement('select');
+                select.name = `ProfessoresIds[${i}]`;
+                select.className = 'skills-modal-input';
+                select.required = true;
+                
+                // Adicionar opção vazia
+                const emptyOption = document.createElement('option');
+                emptyOption.value = '';
+                emptyOption.text = 'Selecionar Professor...';
+                select.appendChild(emptyOption);
+                
+                // Adicionar professores
+                professoresOptions.forEach(prof => {
+                    if (prof.value && prof.text) { // Verificar se os valores existem
+                        const option = document.createElement('option');
+                        option.value = prof.value;
+                        option.text = prof.text;
+                        select.appendChild(option);
+                    }
+                });
+                
+                selectDiv.appendChild(label);
+                selectDiv.appendChild(select);
+                selectsDiv.appendChild(selectDiv);
+            }
+        }
+        
+        // Inicializar se já há valor selecionado
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProfessoresSelects();
+        });
+    </script>
 }
