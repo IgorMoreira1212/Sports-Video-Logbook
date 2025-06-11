@@ -787,22 +787,26 @@ a:hover {
     border-bottom: none;
 }
 .skills-remove-btn {
-    background: #67432F;
+    background: #b30000;
     color: #fff;
     border: none;
-    border-radius: 8px;
-    padding: 7px 22px;
-    font-size: 1rem;
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 0.85rem;
     font-family: Georgia, serif;
     font-weight: 500;
     cursor: pointer;
     transition: background 0.2s;
     margin-left: 0;
     margin-right: 0;
-    box-shadow: 0 2px 8px rgba(103,67,47,0.08);
+    box-shadow: 0 2px 6px rgba(179,0,0,0.12);
+    width: 90px;
+    height: 32px;
+    text-align: center;
+    line-height: 20px;
 }
 .skills-remove-btn:hover {
-    background: #4a2f21;
+    background: #7a0000;
 }
 @media (max-width: 700px) {
     .skills-card {
@@ -1063,17 +1067,21 @@ a:hover {
     background: #67432F;
     color: #fff !important;
     border: none;
-    border-radius: 8px;
-    padding: 7px 15px;
-    font-size: 0.9rem;
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 0.85rem;
     font-family: Georgia, serif;
     font-weight: 500;
     cursor: pointer;
     transition: background 0.2s;
-    margin-right: 8px;
+    margin-right: 0;
     text-decoration: none;
     display: inline-block;
-    box-shadow: 0 2px 8px rgba(103,67,47,0.08);
+    box-shadow: 0 2px 6px rgba(103,67,47,0.12);
+    width: 90px;
+    height: 32px;
+    text-align: center;
+    line-height: 20px;
 }
 
 .skills-edit-btn:hover {
@@ -1108,9 +1116,9 @@ a:hover {
 /* Ajustar coluna de ação das UCs para acomodar apenas o botão remover */
 .skills-th-action {
     text-align: center;
-    width: 160px;
-    min-width: 120px;
-    max-width: 200px;
+    width: 200px;
+    min-width: 180px;
+    max-width: 220px;
     vertical-align: middle;
     padding-right: 0;
     padding-left: 0;
@@ -1119,10 +1127,14 @@ a:hover {
 
 .skills-td-action {
     text-align: center;
-    width: 160px;
-    min-width: 120px;
-    max-width: 200px;
+    width: 200px;
+    min-width: 180px;
+    max-width: 220px;
     vertical-align: middle;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
 }
 
 /* Estilizar a coluna Nº Turmas das UCs */
@@ -1143,4 +1155,40 @@ a:hover {
 
 .skills-modal-row .skills-modal-input {
     flex: 1;
+}
+
+/* --- Alinhamento dos botões de ação --- */
+.skills-td-action form {
+    display: inline-block !important;
+    margin: 0 !important;
+    vertical-align: middle !important;
+}
+
+/* --- Customização para pesquisa de tarefas --- */
+#tarefaSearchForm {
+    display: flex !important;
+    width: 100% !important;
+    gap: 10px !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+#searchTarefa {
+    border-radius: 8px 0 0 8px !important;
+    flex: none !important;
+    width: 425px !important;
+    min-width: 425px !important;
+    max-width: 425px !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    max-height: 42px !important;
+}
+#ucFilter {
+    border-radius: 0 8px 8px 0 !important;
+    flex: none !important;
+    width: 425px !important;
+    min-width: 425px !important;
+    max-width: 425px !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    max-height: 42px !important;
 } 

@@ -37,6 +37,15 @@
                                 <a class="nav-link text-dark" asp-area="" asp-controller="UCs" asp-action="Index">UCs</a>
                             </li>
 						}
+                        @if (User.IsInRole("Professor"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Tarefas" asp-action="Create">Atribuir Tarefa</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Tarefas" asp-action="Index">Tarefas Atribuídas</a>
+                            </li>
+                        }
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>
