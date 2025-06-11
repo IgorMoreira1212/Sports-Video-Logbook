@@ -1,0 +1,608 @@
+﻿@model Sports_Video_Logbook.Models.CreateTarefaViewModel
+@{
+    ViewData["Title"] = "Atribuir Tarefa";
+}
+
+<div class="skills-modal-bg">
+    <div class="skills-modal-card">
+        <form asp-action="Create" class="skills-modal-form" method="post">
+            <!-- Primeira linha: Nome (mais largo) -->
+            <div class="form-row">
+                <div class="form-col-2">
+                    <input asp-for="Nome" class="skills-modal-input" placeholder="Nome*" autocomplete="off" />
+                    <span asp-validation-for="Nome" class="skills-modal-error"></span>
+                </div>
+            </div>
+            
+            <!-- Segunda linha: UC e Atribuir a -->
+            <div class="form-row">
+                <div class="form-col">
+                    <select asp-for="UCId" id="uc-select" class="skills-modal-input">
+                        <option value="">Selecione a UC*</option>
+                        @foreach (var uc in Model.UCsDisponiveis)
+                        {
+                            <option value="@uc.Id">@uc.Nome</option>
+                        }
+                    </select>
+                    <span asp-validation-for="UCId" class="skills-modal-error"></span>
+                </div>
+                <div class="form-col">
+                    <select asp-for="AtribuirA" id="atribuir-select" class="skills-modal-input">
+                        <option value="">Atribuir a*</option>
+                        <option value="Turma">Turma</option>
+                        <option value="Aluno">Aluno</option>
+                    </select>
+                    <span asp-validation-for="AtribuirA" class="skills-modal-error"></span>
+                </div>
+            </div>
+            
+            <!-- Terceira linha: Turma (mais largo) -->
+            <div class="form-row">
+                <div class="form-col-2">
+                    <div class="skills-dropdown-container">
+                        <div class="skills-dropdown-header" id="turma-dropdown-header">
+                            <input type="text" class="skills-modal-input" placeholder="Turma*" id="turma-search" autocomplete="off" readonly />
+                            <span class="dropdown-arrow">⏷</span>
+                        </div>
+                        <div class="skills-dropdown-content" id="turma-dropdown">
+                            <div class="skills-search-container">
+                                <input type="text" placeholder="Pesquisar" id="turma-filter" class="skills-search-input" />
+                            </div>
+                            <div class="skills-options" id="turma-options">
+                                @foreach (var turma in Model.TurmasDisponiveis)
+                                {
+                                    <label class="skills-option turma-option" data-ucid="@turma.UCId">
+                                        <input type="checkbox" name="TurmasSelecionadas" value="@turma.Nome" />
+                                        <span>@turma.Nome</span>
+                                    </label>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <span asp-validation-for="TurmasSelecionadas" class="skills-modal-error"></span>
+                </div>
+            </div>
+            
+            <!-- Quarta linha: Alunos (condicional) -->
+            <div id="alunos-container" style="display: none;">
+                <div class="form-row">
+                    <div class="form-col-2">
+                        <div class="skills-dropdown-container">
+                            <div class="skills-dropdown-header" id="alunos-header">
+                                <input type="text" class="skills-modal-input" placeholder="Alunos*" id="alunos-search" autocomplete="off" readonly />
+                                <span class="dropdown-arrow">⏷</span>
+                            </div>
+                            <div class="skills-dropdown-content" id="alunos-dropdown">
+                                <div class="skills-search-container">
+                                    <input type="text" placeholder="Pesquisar" id="alunos-filter" class="skills-search-input" />
+                                </div>
+                                <div class="skills-options" id="alunos-options">
+                                    <!-- Alunos serão carregados dinamicamente -->
+                                </div>
+                            </div>
+                        </div>
+                        <span asp-validation-for="AlunosSelecionados" class="skills-modal-error"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quinta linha: Skills (mais largo) -->
+            <div class="form-row">
+                <div class="form-col-2">
+                    <div class="skills-dropdown-container">
+                        <div class="skills-dropdown-header">
+                            <input type="text" class="skills-modal-input" placeholder="Skills*" id="skills-search" autocomplete="off" readonly />
+                            <span class="dropdown-arrow">⏷</span>
+                        </div>
+                        <div class="skills-dropdown-content" id="skills-dropdown">
+                            <div class="skills-search-container">
+                                <input type="text" placeholder="Pesquisar" id="skills-filter" class="skills-search-input" />
+                            </div>
+                            <div class="skills-options" id="skills-options">
+                                @foreach (var skill in Model.SkillsDisponiveis)
+                                {
+                                    <label class="skills-option">
+                                        <input type="checkbox" name="SkillsSelecionadas" value="@skill.Id" />
+                                        <span>@skill.Nome</span>
+                                    </label>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <span asp-validation-for="SkillsSelecionadas" class="skills-modal-error"></span>
+                </div>
+            </div>
+            
+            <!-- Sexta linha: Descrição (mais largo) -->
+            <div class="form-row">
+                <div class="form-col-2">
+                    <textarea asp-for="Descricao" class="skills-modal-input" placeholder="Descrição*" rows="5" style="resize: vertical; min-height: 120px;"></textarea>
+                    <span asp-validation-for="Descricao" class="skills-modal-error"></span>
+                </div>
+            </div>
+            
+            <div asp-validation-summary="All" class="skills-modal-error"></div>
+            
+            <div class="skills-modal-btns">
+                <button type="submit" class="skills-modal-submit">SUBMETER</button>
+                <a asp-action="Index" class="skills-modal-cancel">CANCELAR</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+/* Aumentar largura do modal para tarefas */
+.skills-modal-card {
+    width: 90%;
+    max-width: 800px;
+    padding: 25px;
+}
+
+/* Layout de campos em linha */
+.form-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.form-col {
+    flex: 1;
+}
+
+.form-col-2 {
+    flex: 2;
+}
+
+.skills-dropdown-container {
+    position: relative;
+    margin-bottom: 10px;
+}
+
+.skills-dropdown-header {
+    position: relative;
+    cursor: pointer;
+}
+
+.dropdown-arrow {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+    pointer-events: none;
+}
+
+/* Estilizar selects para ter aparência consistente */
+select.skills-modal-input {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="%23666" d="M2 0L0 2h4zm0 5L0 3h4z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 12px;
+    padding-right: 35px;
+}
+
+.skills-dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.skills-search-container {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.skills-search-input {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    outline: none;
+}
+
+.skills-options {
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.skills-option {
+    display: flex;
+    align-items: center;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.skills-option:hover {
+    background-color: #f5f5f5;
+}
+
+.skills-option input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+.skills-dropdown-content.show {
+    display: block;
+}
+
+/* Responsividade para o layout em colunas */
+@@media (max-width: 768px) {
+    .skills-modal-card {
+        width: 95%;
+        max-width: none;
+        padding: 15px;
+    }
+    
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+    
+    .form-col, .form-col-2 {
+        flex: none;
+        width: 100%;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ucSelect = document.getElementById('uc-select');
+    const atribuirSelect = document.getElementById('atribuir-select');
+    const alunosContainer = document.getElementById('alunos-container');
+    
+    // Alunos dropdown functionality
+    const alunosSearch = document.getElementById('alunos-search');
+    const alunosDropdown = document.getElementById('alunos-dropdown');
+    const alunosFilter = document.getElementById('alunos-filter');
+    const alunosOptions = document.getElementById('alunos-options');
+    
+    // Skills dropdown functionality
+    const skillsSearch = document.getElementById('skills-search');
+    const skillsDropdown = document.getElementById('skills-dropdown');
+    const skillsFilter = document.getElementById('skills-filter');
+    const skillsOptions = document.getElementById('skills-options');
+    const skillsCheckboxes = document.querySelectorAll('input[name="SkillsSelecionadas"]');
+    
+    // Turma dropdown functionality
+    const turmaSearch = document.getElementById('turma-search');
+    const turmaDropdown = document.getElementById('turma-dropdown');
+    const turmaFilter = document.getElementById('turma-filter');
+    const turmaOptions = document.getElementById('turma-options');
+    const turmaCheckboxes = document.querySelectorAll('input[name="TurmasSelecionadas"]');
+    
+    // Dados dos alunos do servidor
+    const alunosData = [
+        @foreach (var aluno in Model.AlunosDisponiveis)
+        {
+            <text>{
+                id: '@aluno.Id',
+                displayText: '@aluno.DisplayText',
+                turmaNome: '@aluno.TurmaNome',
+                ucId: @aluno.UCId
+            },</text>
+        }
+    ];
+
+    // UC/Turma dependency
+    ucSelect.addEventListener('change', function() {
+        const selectedUCId = this.value;
+        const turmaOptionsElements = turmaOptions.querySelectorAll('.turma-option[data-ucid]');
+        
+        // Reset turma selection
+        turmaCheckboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        updateTurmaDisplay();
+        
+        // Reset alunos selection and clear dropdown
+        clearAlunosSelection();
+        alunosOptions.innerHTML = '';
+        updateAlunosDisplay();
+        
+        // Show/hide turma options based on selected UC
+        turmaOptionsElements.forEach(option => {
+            if (!selectedUCId || option.dataset.ucid === selectedUCId) {
+                option.style.display = 'flex';
+            } else {
+                option.style.display = 'none';
+            }
+        });
+    });
+    
+    // Atribuir a functionality
+    atribuirSelect.addEventListener('change', function() {
+        if (this.value === 'Aluno') {
+            alunosContainer.style.display = 'block';
+            // Reset turma selection
+            turmaCheckboxes.forEach(cb => {
+                cb.checked = false;
+                cb.required = false;
+            });
+            // Mudar para seleção única (radio buttons)
+            convertTurmaToRadio();
+            updateTurmaDisplay();
+            // Reset alunos
+            clearAlunosSelection();
+            alunosOptions.innerHTML = '';
+            updateAlunosDisplay();
+        } else if (this.value === 'Turma') {
+            alunosContainer.style.display = 'none';
+            clearAlunosSelection();
+            // Mudar para seleção múltipla (checkboxes)
+            convertTurmaToCheckbox();
+            turmaCheckboxes.forEach(cb => cb.required = true);
+        } else {
+            alunosContainer.style.display = 'none';
+            clearAlunosSelection();
+            // Mudar para seleção múltipla (checkboxes)
+            convertTurmaToCheckbox();
+            turmaCheckboxes.forEach(cb => {
+                cb.checked = false;
+                cb.required = false;
+            });
+            updateTurmaDisplay();
+        }
+    });
+    
+    // Skills dropdown toggle
+    skillsSearch.addEventListener('click', function() {
+        skillsDropdown.classList.toggle('show');
+        turmaDropdown.classList.remove('show'); // Close turma dropdown
+    });
+    
+    // Turma dropdown toggle
+    turmaSearch.addEventListener('click', function() {
+        turmaDropdown.classList.toggle('show');
+        skillsDropdown.classList.remove('show'); // Close skills dropdown
+        alunosDropdown.classList.remove('show'); // Close alunos dropdown
+    });
+    
+    // Alunos dropdown toggle
+    alunosSearch.addEventListener('click', function() {
+        alunosDropdown.classList.toggle('show');
+        skillsDropdown.classList.remove('show'); // Close skills dropdown
+        turmaDropdown.classList.remove('show'); // Close turma dropdown
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.skills-dropdown-container')) {
+            skillsDropdown.classList.remove('show');
+        }
+        if (!e.target.closest('#turma-dropdown-header') && !e.target.closest('#turma-dropdown')) {
+            turmaDropdown.classList.remove('show');
+        }
+        if (!e.target.closest('#alunos-header') && !e.target.closest('#alunos-dropdown')) {
+            alunosDropdown.classList.remove('show');
+        }
+    });
+    
+    // Skills filter
+    skillsFilter.addEventListener('input', function() {
+        const filterText = this.value.toLowerCase();
+        const options = skillsOptions.querySelectorAll('.skills-option');
+        
+        options.forEach(option => {
+            const text = option.textContent.toLowerCase();
+            option.style.display = text.includes(filterText) ? 'flex' : 'none';
+        });
+    });
+    
+    // Turma filter
+    turmaFilter.addEventListener('input', function() {
+        const filterText = this.value.toLowerCase();
+        const options = turmaOptions.querySelectorAll('.turma-option');
+        
+        options.forEach(option => {
+            const text = option.textContent.toLowerCase();
+            option.style.display = text.includes(filterText) ? 'flex' : 'none';
+        });
+    });
+    
+    // Alunos filter
+    alunosFilter.addEventListener('input', function() {
+        const filterText = this.value.toLowerCase();
+        const options = alunosOptions.querySelectorAll('.aluno-option');
+        
+        options.forEach(option => {
+            const text = option.textContent.toLowerCase();
+            option.style.display = text.includes(filterText) ? 'flex' : 'none';
+        });
+    });
+    
+    // Update skills display
+    function updateSkillsDisplay() {
+        const selected = Array.from(skillsCheckboxes)
+            .filter(cb => cb.checked)
+            .map(cb => cb.nextElementSibling.textContent);
+        
+        if (selected.length > 0) {
+            skillsSearch.value = selected.join(', ');
+            skillsSearch.style.color = '#333';
+        } else {
+            skillsSearch.value = '';
+            skillsSearch.placeholder = 'Skills*';
+            skillsSearch.style.color = '#999';
+        }
+    }
+    
+    // Update turma display
+    function updateTurmaDisplay() {
+        // Pegar elementos atuais (checkboxes ou radio buttons)
+        const currentTurmaInputs = document.querySelectorAll('input[name="TurmasSelecionadas"], input[name="TurmaSelecionada"]');
+        const selected = Array.from(currentTurmaInputs)
+            .filter(cb => cb.checked)
+            .map(cb => cb.nextElementSibling.textContent);
+        
+        if (selected.length > 0) {
+            turmaSearch.value = selected.join(', ');
+            turmaSearch.style.color = '#333';
+        } else {
+            turmaSearch.value = '';
+            turmaSearch.placeholder = 'Turma*';
+            turmaSearch.style.color = '#999';
+        }
+    }
+    
+    // Converter turmas para radio buttons (seleção única)
+    function convertTurmaToRadio() {
+        turmaCheckboxes.forEach(checkbox => {
+            checkbox.type = 'radio';
+            checkbox.name = 'TurmaSelecionada'; // Nome diferente para radio
+            checkbox.checked = false; // Reset selection
+        });
+        // Atualizar referências
+        updateTurmaCheckboxesReference();
+    }
+    
+    // Converter turmas para checkboxes (seleção múltipla)
+    function convertTurmaToCheckbox() {
+        turmaCheckboxes.forEach(checkbox => {
+            checkbox.type = 'checkbox';
+            checkbox.name = 'TurmasSelecionadas'; // Nome original para checkbox
+            checkbox.checked = false; // Reset selection
+        });
+        // Atualizar referências
+        updateTurmaCheckboxesReference();
+    }
+    
+    // Atualizar referências dos checkboxes após conversão
+    function updateTurmaCheckboxesReference() {
+        const newTurmaCheckboxes = document.querySelectorAll('input[name="TurmasSelecionadas"], input[name="TurmaSelecionada"]');
+        
+        // Remover listeners antigos
+        turmaCheckboxes.forEach(checkbox => {
+            checkbox.removeEventListener('change', updateTurmaDisplay);
+        });
+        
+        // Adicionar listeners aos novos elementos
+        newTurmaCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateTurmaDisplay);
+            checkbox.addEventListener('change', function() {
+                const anyChecked = Array.from(newTurmaCheckboxes).some(cb => cb.checked);
+                newTurmaCheckboxes.forEach(cb => {
+                    cb.setCustomValidity(anyChecked ? '' : 'Deve selecionar pelo menos uma turma');
+                });
+                
+                // Carregar alunos quando uma turma é selecionada/deselecionada
+                if (atribuirSelect.value === 'Aluno') {
+                    carregarAlunosPorTurma();
+                }
+            });
+        });
+    }
+    
+    // Função para carregar alunos baseado na turma selecionada
+    function carregarAlunosPorTurma() {
+        const turmasSelecionadas = Array.from(document.querySelectorAll('input[name="TurmaSelecionada"]:checked, input[name="TurmasSelecionadas"]:checked'))
+            .map(cb => cb.value);
+        
+        // Limpar alunos
+        alunosOptions.innerHTML = '';
+        
+        if (turmasSelecionadas.length === 0) {
+            updateAlunosDisplay();
+            return;
+        }
+        
+        // Filtrar alunos pelas turmas selecionadas
+        const alunosFiltrados = alunosData.filter(aluno => 
+            turmasSelecionadas.includes(aluno.turmaNome)
+        );
+        
+        if (alunosFiltrados.length === 0) {
+            alunosOptions.innerHTML = '<div style="padding: 15px; text-align: center; color: #666;">Nenhum aluno encontrado nesta(s) turma(s)</div>';
+            updateAlunosDisplay();
+            return;
+        }
+        
+        // Criar opções para alunos
+        alunosFiltrados.forEach(aluno => {
+            const option = document.createElement('label');
+            option.className = 'skills-option aluno-option';
+            option.innerHTML = `
+                <input type="checkbox" name="AlunosSelecionados" value="${aluno.id}" />
+                <span>${aluno.displayText}</span>
+            `;
+            alunosOptions.appendChild(option);
+        });
+        
+        // Adicionar event listeners aos novos checkboxes
+        const alunosCheckboxes = alunosOptions.querySelectorAll('input[name="AlunosSelecionados"]');
+        alunosCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateAlunosDisplay);
+        });
+        
+        updateAlunosDisplay();
+    }
+    
+    // Update alunos display
+    function updateAlunosDisplay() {
+        const alunosCheckboxes = document.querySelectorAll('input[name="AlunosSelecionados"]');
+        const selected = Array.from(alunosCheckboxes)
+            .filter(cb => cb.checked)
+            .map(cb => cb.nextElementSibling.textContent);
+        
+        if (selected.length > 0) {
+            alunosSearch.value = selected.join(', ');
+            alunosSearch.style.color = '#333';
+        } else {
+            alunosSearch.value = '';
+            alunosSearch.placeholder = 'Alunos*';
+            alunosSearch.style.color = '#999';
+        }
+    }
+    
+    // Clear alunos selection
+    function clearAlunosSelection() {
+        const alunosCheckboxes = document.querySelectorAll('input[name="AlunosSelecionados"]');
+        alunosCheckboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        updateAlunosDisplay();
+    }
+    
+    // Skills checkbox change handler
+    skillsCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateSkillsDisplay);
+    });
+    
+    // Turma checkbox change handler
+    turmaCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateTurmaDisplay);
+    });
+    
+    // Validation for turma checkboxes
+    turmaCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const anyChecked = Array.from(turmaCheckboxes).some(cb => cb.checked);
+            turmaCheckboxes.forEach(cb => {
+                cb.setCustomValidity(anyChecked ? '' : 'Deve selecionar pelo menos uma turma');
+            });
+        });
+    });
+    
+    // Initialize
+    updateSkillsDisplay();
+    updateTurmaDisplay();
+    updateAlunosDisplay();
+});
+</script>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
