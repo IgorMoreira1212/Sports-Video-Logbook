@@ -1,0 +1,36 @@
+﻿@model Sports_Video_Logbook.Models.UC
+
+@{
+    ViewData["Title"] = "Adicionar UC";
+}
+
+<div class="skills-modal-bg">
+    <div class="skills-modal-card">
+        <form asp-action="Create" class="skills-modal-form" method="post">
+            <input asp-for="Nome" class="skills-modal-input" placeholder="Nome da UC*" autocomplete="off" />
+            <span asp-validation-for="Nome" class="skills-modal-error"></span>
+            <select name="NumeroTurmas" class="skills-modal-input">
+                <option value="">Nº Turmas*</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+            </select>
+            <span class="skills-modal-error">@Html.ValidationMessage("NumeroTurmas")</span>
+            <div class="skills-modal-btns">
+                <button type="submit" class="skills-modal-submit">SUBMETER</button>
+                <a asp-action="Index" class="skills-modal-cancel">CANCELAR</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

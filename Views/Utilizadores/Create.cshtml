@@ -9,10 +9,12 @@
             <span asp-validation-for="UserName" class="skills-modal-error"></span>
             <input asp-for="Email" class="skills-modal-input" placeholder="Email*" autocomplete="off" />
             <span asp-validation-for="Email" class="skills-modal-error"></span>
-            <input asp-for="Numero_Mecanografico" class="skills-modal-input" placeholder="Nº Mecanográfico" autocomplete="off" />
-            <span asp-validation-for="Numero_Mecanografico" class="skills-modal-error"></span>
+            <div id="numero-mecanografico-container" style="display: none;">
+                <input asp-for="Numero_Mecanografico" class="skills-modal-input" placeholder="Nº Mecanográfico" autocomplete="off" />
+                <span asp-validation-for="Numero_Mecanografico" class="skills-modal-error"></span>
+            </div>
             <input name="password" type="password" class="skills-modal-input" placeholder="Password*" autocomplete="off" />
-            <select name="role" class="skills-modal-input">
+            <select name="role" id="role-select" class="skills-modal-input">
                 <option value="Aluno">Aluno</option>
                 <option value="Professor">Professor</option>
                 <option value="Administrador">Administrador</option>
@@ -24,6 +26,32 @@
         </form>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const roleSelect = document.getElementById('role-select');
+    const numeroMecanograficoContainer = document.getElementById('numero-mecanografico-container');
+    const numeroMecanograficoInput = document.querySelector('input[name="Numero_Mecanografico"]');
+    
+    function toggleNumeroMecanografico() {
+        if (roleSelect.value === 'Aluno') {
+            numeroMecanograficoContainer.style.display = 'block';
+            numeroMecanograficoInput.required = true;
+        } else {
+            numeroMecanograficoContainer.style.display = 'none';
+            numeroMecanograficoInput.required = false;
+            numeroMecanograficoInput.value = ''; // Limpa o valor quando não é aluno
+        }
+    }
+    
+    // Executar quando a página carregar
+    toggleNumeroMecanografico();
+    
+    // Executar quando o role mudar
+    roleSelect.addEventListener('change', toggleNumeroMecanografico);
+});
+</script>
+
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 } 

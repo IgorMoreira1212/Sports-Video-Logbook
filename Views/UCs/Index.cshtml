@@ -1,0 +1,48 @@
+﻿@model IEnumerable<dynamic>
+
+@{
+    ViewData["Title"] = "UCs";
+}
+
+<div class="skills-card">
+    <div class="skills-header">
+        <input id="searchUC" type="text" class="skills-search" placeholder="Pesquisar" />
+        <a asp-action="Create" class="skills-add-btn">ADICIONAR UC</a>
+    </div>
+    <table class="skills-table">
+        <thead>
+            <tr>
+                <th class="skills-th">Unidade Curricular</th>
+                <th class="skills-th">Nº Turmas</th>
+                <th class="skills-th skills-th-action">Ação</th>
+            </tr>
+        </thead>
+        <tbody id="ucsList">
+        @foreach (var item in Model) {
+            <tr class="skill-row">
+                <td class="skills-td">@item.UC.Nome</td>
+                <td class="skills-td" style="text-align: center;">@item.NumeroTurmas</td>
+                <td class="skills-td skills-td-action">
+                    <form asp-action="Delete" asp-route-id="@item.UC.Id" method="post" style="display:inline;">
+                        <input type="hidden" name="Id" value="@item.UC.Id" />
+                        <button type="submit" class="skills-remove-btn" onclick="return confirm('Tem certeza que deseja remover esta UC?')">REMOVER</button>
+                    </form>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+<script>
+    document.getElementById('searchUC').addEventListener('input', function() {
+        var filter = this.value.toLowerCase();
+        var rows = document.querySelectorAll('#ucsList .skill-row');
+        rows.forEach(function(row) {
+            var ucName = row.querySelector('.skills-td').textContent.toLowerCase();
+            row.style.display = ucName.includes(filter) ? '' : 'none';
+        });
+    });
+</script>
+}
