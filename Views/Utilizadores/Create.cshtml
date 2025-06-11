@@ -1,4 +1,4 @@
-@model Sports_Video_Logbook.Models.Utilizador
+@model Sports_Video_Logbook.Models.CreateUtilizadorViewModel
 @{
     ViewData["Title"] = "Adicionar Utilizador";
 }
@@ -7,18 +7,60 @@
         <form asp-action="Create" class="skills-modal-form" method="post">
             <input asp-for="UserName" class="skills-modal-input" placeholder="UserName*" autocomplete="off" />
             <span asp-validation-for="UserName" class="skills-modal-error"></span>
+            
             <input asp-for="Email" class="skills-modal-input" placeholder="Email*" autocomplete="off" />
             <span asp-validation-for="Email" class="skills-modal-error"></span>
+            
             <div id="numero-mecanografico-container" style="display: none;">
                 <input asp-for="Numero_Mecanografico" class="skills-modal-input" placeholder="Nº Mecanográfico" autocomplete="off" />
                 <span asp-validation-for="Numero_Mecanografico" class="skills-modal-error"></span>
             </div>
-            <input name="password" type="password" class="skills-modal-input" placeholder="Password*" autocomplete="off" />
-            <select name="role" id="role-select" class="skills-modal-input">
+            
+            <input asp-for="Password" type="password" class="skills-modal-input" placeholder="Password*" autocomplete="off" />
+            <span asp-validation-for="Password" class="skills-modal-error"></span>
+            
+            <select asp-for="Role" id="role-select" class="skills-modal-input">
+                <option value="">Selecionar Role*</option>
                 <option value="Aluno">Aluno</option>
                 <option value="Professor">Professor</option>
-                <option value="Administrador">Administrador</option>
+                <option value="Admin">Administrador</option>
             </select>
+            <span asp-validation-for="Role" class="skills-modal-error"></span>
+            
+            <!-- Seção para seleção de turmas (só para alunos) -->
+            <div id="turmas-container" style="display: none;">
+                <h4 style="margin: 15px 0 10px 0; color: #333;">Selecionar Turmas:</h4>
+                @if (!Model.UCsDisponiveis.Any())
+                {
+                    <div style="color: red; margin: 10px 0;">
+                        <strong>Aviso:</strong> Não há UCs ou turmas disponíveis no sistema.
+                    </div>
+                }
+                else
+                {
+                    <div style="max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; margin: 10px 0;">
+                        @foreach (var uc in Model.UCsDisponiveis)
+                        {
+                            <div style="margin-bottom: 15px;">
+                                <h5 style="margin-bottom: 5px; color: #555;">@uc.UCNome</h5>
+                                @foreach (var turma in uc.Turmas)
+                                {
+                                    <div style="margin-left: 15px; margin-bottom: 5px;">
+                                        <label style="display: flex; align-items: center;">
+                                            <input type="checkbox" name="TurmasSelecionadas" value="@turma.Value" style="margin-right: 8px;" />
+                                            <span>@turma.Nome (@turma.ProfessorNome)</span>
+                                        </label>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+                <span asp-validation-for="TurmasSelecionadas" class="skills-modal-error"></span>
+            </div>
+            
+            <div asp-validation-summary="All" class="skills-modal-error"></div>
+            
             <div class="skills-modal-btns">
                 <button type="submit" class="skills-modal-submit">SUBMETER</button>
                 <a asp-action="Index" class="skills-modal-cancel">CANCELAR</a>
@@ -32,23 +74,60 @@ document.addEventListener('DOMContentLoaded', function() {
     const roleSelect = document.getElementById('role-select');
     const numeroMecanograficoContainer = document.getElementById('numero-mecanografico-container');
     const numeroMecanograficoInput = document.querySelector('input[name="Numero_Mecanografico"]');
+    const turmasContainer = document.getElementById('turmas-container');
+    const turmasCheckboxes = document.querySelectorAll('input[name="TurmasSelecionadas"]');
     
-    function toggleNumeroMecanografico() {
+    function toggleFieldsBasedOnRole() {
+        console.log('Role selected:', roleSelect.value); // Debug
+        
         if (roleSelect.value === 'Aluno') {
+            // Mostrar campos específicos de aluno
             numeroMecanograficoContainer.style.display = 'block';
             numeroMecanograficoInput.required = true;
+            turmasContainer.style.display = 'block';
+            
+            // Tornar pelo menos uma turma obrigatória
+            turmasCheckboxes.forEach(checkbox => {
+                checkbox.required = true;
+            });
         } else {
+            // Esconder e limpar campos específicos de aluno
             numeroMecanograficoContainer.style.display = 'none';
             numeroMecanograficoInput.required = false;
-            numeroMecanograficoInput.value = ''; // Limpa o valor quando não é aluno
+            numeroMecanograficoInput.value = '';
+            turmasContainer.style.display = 'none';
+            
+            // Desmarcar todas as turmas e remover obrigatoriedade
+            turmasCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+                checkbox.required = false;
+            });
+            
+            // Remover mensagens de erro
+            const validationSpans = [numeroMecanograficoInput.nextElementSibling];
+            validationSpans.forEach(span => {
+                if (span && span.classList.contains('skills-modal-error')) {
+                    span.textContent = '';
+                }
+            });
         }
     }
     
     // Executar quando a página carregar
-    toggleNumeroMecanografico();
+    toggleFieldsBasedOnRole();
     
     // Executar quando o role mudar
-    roleSelect.addEventListener('change', toggleNumeroMecanografico);
+    roleSelect.addEventListener('change', toggleFieldsBasedOnRole);
+    
+    // Validação customizada para checkboxes
+    turmasCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const anyChecked = Array.from(turmasCheckboxes).some(cb => cb.checked);
+            turmasCheckboxes.forEach(cb => {
+                cb.setCustomValidity(anyChecked ? '' : 'Deve selecionar pelo menos uma turma');
+            });
+        });
+    });
 });
 </script>
 

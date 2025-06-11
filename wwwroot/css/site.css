@@ -29,6 +29,9 @@ body {
 /* Classe específica para a página inicial */
 body.home-page {
   overflow-y: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 }
 
 /* Fundo da página com desfoque consistente */
@@ -124,6 +127,18 @@ header {
   padding-bottom: 40px;
 }
 
+/* Específico para a página inicial - remover padding do container */
+body.home-page .container {
+  padding: 0;
+  margin: 0;
+  max-width: none;
+  width: 100%;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .container-fluid {
   padding-left: 15px;
   padding-right: 15px;
@@ -163,12 +178,24 @@ header {
   color: white !important;
 }
 
+/* Home page content wrapper para centralização vertical */
+.home-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
 .text-center {
   color: white;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
-  padding-top: 45px;
-  padding-bottom: 45px;
+  padding-top: 0;
+  padding-bottom: 50px;
   margin: 0;
+  transform: translateY(-20px);
 }
 
 /* Text styles for better readability */
@@ -195,8 +222,8 @@ a:hover {
   display: flex;
   justify-content: center;
   gap: 20px;
-  margin-top: 0;
-  margin-bottom: 0;
+  margin: 0;
+  flex-shrink: 0; /* Evita que os retângulos encolham */
 }
 
 .vertical-rectangle {
@@ -337,11 +364,15 @@ a:hover {
 }
 
 @media (max-width: 576px) {
+  .text-center {
+    padding-bottom: 20px;
+  }
+  
   .rectangles-container {
     flex-direction: column;
     align-items: center;
-    gap: 50px;
-    padding: 20px 0;
+    gap: 30px;
+    padding: 0;
   }
   
   .vertical-rectangle {

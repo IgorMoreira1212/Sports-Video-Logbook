@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Sports_Video_Logbook.Data;
 using Sports_Video_Logbook.Models;
@@ -156,6 +157,8 @@ namespace Sports_Video_Logbook.Areas.Identity.Pages.Account
                     
                     await _userManager.AddToRoleAsync(user, Input.Role);
 
+                    // Nota: A inscrição em turmas agora é feita manualmente pelo admin na criação de utilizadores
+
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
@@ -211,5 +214,7 @@ namespace Sports_Video_Logbook.Areas.Identity.Pages.Account
             }
             return (IUserEmailStore<Utilizador>)_userStore;
         }
+
+
     }
 }
