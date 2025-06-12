@@ -248,6 +248,32 @@ namespace Sports_Video_Logbook.Data.Migrations
                     b.ToTable("Skill");
                 });
 
+            modelBuilder.Entity("Sports_Video_Logbook.Models.SubmissaoFicheiro", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Caminho")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SubmissaoTarefaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SubmissaoTarefaId");
+
+                    b.ToTable("SubmissaoFicheiro");
+                });
+
             modelBuilder.Entity("Sports_Video_Logbook.Models.SubmissaoTarefa", b =>
                 {
                     b.Property<int>("Id")
@@ -585,6 +611,17 @@ namespace Sports_Video_Logbook.Data.Migrations
                     b.Navigation("UC");
                 });
 
+            modelBuilder.Entity("Sports_Video_Logbook.Models.SubmissaoFicheiro", b =>
+                {
+                    b.HasOne("Sports_Video_Logbook.Models.SubmissaoTarefa", "SubmissaoTarefa")
+                        .WithMany("Ficheiros")
+                        .HasForeignKey("SubmissaoTarefaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SubmissaoTarefa");
+                });
+
             modelBuilder.Entity("Sports_Video_Logbook.Models.SubmissaoTarefa", b =>
                 {
                     b.HasOne("Sports_Video_Logbook.Models.Utilizador", "Aluno")
@@ -674,6 +711,8 @@ namespace Sports_Video_Logbook.Data.Migrations
             modelBuilder.Entity("Sports_Video_Logbook.Models.SubmissaoTarefa", b =>
                 {
                     b.Navigation("AvaliacoesSkills");
+
+                    b.Navigation("Ficheiros");
                 });
 
             modelBuilder.Entity("Sports_Video_Logbook.Models.Tarefa", b =>

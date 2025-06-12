@@ -148,6 +148,7 @@
                         {
                             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                                 <a asp-action="Details" asp-route-id="@item.Id" class="skills-details-btn">DETALHES</a>
+                                <a asp-action="VerSubmissoes" asp-route-id="@item.Id" class="skills-details-btn" style="background-color: #67432F; color: white; margin-left: 8px;">VER SUBMISSÕES</a>
                                 <button type="button" class="skills-details-btn" style="background-color: #b30000; color: white; border: none; cursor: pointer;" onclick="confirmarRemocao(@item.Id, '@item.Titulo')">REMOVER</button>
                             </div>
                         }
@@ -164,13 +165,7 @@
         <div class="mt-3" style="padding: 15px 0; border-top: 1px solid #ddd;">
             <small class="text-muted">
                 <i class="bi bi-info-circle"></i> 
-                @if (User.IsInRole("Aluno"))
-                {
-                    @:Total no histórico: @Model.Count() | 
-                    @:Concluídas: @(Model.Count(t => t.Concluida)) | 
-                    @:Expiradas: @(Model.Count(t => !t.Concluida))
-                }
-                else
+                @if (!User.IsInRole("Aluno"))
                 {
                     @:Total de tarefas: @Model.Count() | 
                     @:Concluídas: @(Model.Count(t => t.Concluida)) | 
