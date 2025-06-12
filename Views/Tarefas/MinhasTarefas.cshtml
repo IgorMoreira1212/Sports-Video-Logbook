@@ -1,0 +1,144 @@
+@model IEnumerable<Sports_Video_Logbook.Models.Tarefa>
+
+@{
+    ViewData["Title"] = "Minhas Tarefas";
+}
+
+<div class="skills-card">
+    <div class="skills-header">
+        <form id="tarefaSearchForm" method="get" style="display: flex; width: 100%; gap: 15px;">
+            <input id="searchTarefa" name="search" type="text" class="skills-search" placeholder="Pesquisar tarefas..." value="@ViewBag.SearchValue" autocomplete="off" style="flex: 1;" />
+            
+            <select id="ucFilter" name="uc" class="skills-search" style="flex: 1;">
+                <option value="">Todas as UCs</option>
+                @foreach (var uc in ViewBag.UCsDisponiveis ?? new List<dynamic>())
+                {
+                    @if (ViewBag.UCValue == uc.Id.ToString())
+                    {
+                        <option value="@uc.Id" selected>@uc.Nome</option>
+                    }
+                    else
+                    {
+                        <option value="@uc.Id">@uc.Nome</option>
+                    }
+                }
+            </select>
+        </form>
+    </div>
+    
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin: 15px 0;">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center" style="margin: 20px 0;">
+            <i class="bi bi-info-circle"></i> Nenhuma tarefa encontrada.
+        </div>
+    }
+    else
+    {
+        <table class="skills-table">
+            <thead>
+                <tr>
+                    <th class="skills-th">Tarefa</th>
+                    <th class="skills-th">Unidade Curricular</th>
+                    <th class="skills-th">Data Limite</th>
+                    <th class="skills-th skills-th-action">Ação</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Model) 
+            {
+                <tr class="skill-row">
+                    <td class="skills-td">
+                        <strong>@item.Titulo</strong>
+                        @if (!string.IsNullOrEmpty(item.Descricao))
+                        {
+                            <br><small class="text-muted">@item.Descricao</small>
+                        }
+                        <br>
+                        <span class="badge bg-warning text-dark">
+                            <i class="bi bi-clock"></i> Pendente
+                        </span>
+                    </td>
+                    <td class="skills-td">@(item.UC?.Nome ?? "N/A")</td>
+                    <td class="skills-td">
+                        @item.DataFim.ToString("dd/MM/yyyy")
+                        <br><small class="text-muted">@item.DataFim.ToString("HH:mm")</small>
+                        @if (item.DataFim.Date == DateTime.Today)
+                        {
+                            <br><small class="text-warning">
+                                <i class="bi bi-clock"></i> Vence hoje
+                            </small>
+                        }
+                    </td>
+                    <td class="skills-td skills-td-action">
+                        <a asp-action="Details" asp-route-id="@item.Id" class="skills-details-btn">DETALHES</a>
+                        
+                        <form asp-action="CompletarTarefa" asp-route-id="@item.Id" method="post" style="display:inline;">
+                            <button type="submit" class="skills-details-btn" onclick="return confirm('Tem certeza que deseja marcar esta tarefa como concluída?')" style="background-color: #1e7e34; border-color: #1e7e34; padding: 8px 20px; min-width: 120px; text-align: center; vertical-align: middle; display: inline-block;">
+                                COMPLETAR
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+        
+        <div class="mt-3" style="padding: 15px 0; border-top: 1px solid #ddd;">
+            <small class="text-muted">
+                <i class="bi bi-info-circle"></i> 
+                Total de tarefas pendentes: @Model.Count()
+                @if (Model.Any(t => t.DataFim.Date == DateTime.Today))
+                {
+                    <span class="text-warning"> | @(Model.Count(t => t.DataFim.Date == DateTime.Today)) vencem hoje</span>
+                }
+            </small>
+        </div>
+    }
+</div>
+
+@section Scripts {
+<script>
+    // Debounce function
+    function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    }
+    
+    // Submit on search input and filter changes
+    const searchInput = document.getElementById('searchTarefa');
+    const ucFilter = document.getElementById('ucFilter');
+    const form = document.getElementById('tarefaSearchForm');
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', debounce(function() {
+            form.submit();
+        }, 400));
+    }
+    
+    if (ucFilter) {
+        ucFilter.addEventListener('change', function() {
+            form.submit();
+        });
+    }
+    
+    // Auto-dismiss success alerts after 5 seconds
+    setTimeout(function() {
+        var alerts = document.querySelectorAll('.alert-success');
+        alerts.forEach(function(alert) {
+            var bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        });
+    }, 5000);
+</script>
+} 

@@ -10,6 +10,8 @@
     <form asp-action="Edit" class="skills-modal-form">
         <div asp-validation-summary="ModelOnly" class="skills-modal-error"></div>
         <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="AlunoId" />
+        <input type="hidden" asp-for="TurmaUCId" />
         
         <div class="skills-modal-row">
             <div style="flex: 1;">
@@ -76,6 +78,15 @@
                 </select>
                 <span asp-validation-for="TurmaNome" class="skills-modal-error"></span>
             </div>
+            @if (!string.IsNullOrEmpty(Model.AlunoId))
+            {
+                <div style="flex: 1;">
+                    <label class="control-label" style="color: #67432F; font-family: Georgia, serif; font-weight: 500; margin-bottom: 5px; display: block;">Atribuída ao Aluno</label>
+                    <div style="padding: 12px 16px; border-radius: 8px; border: 2px solid #b9b9b9; background: #f7f7f7; color: #67432F; font-family: Georgia, serif;">
+                        @(Model.Aluno?.UserName ?? "Aluno não encontrado")
+                    </div>
+                </div>
+            }
         </div>
         
         <div class="skills-modal-btns">

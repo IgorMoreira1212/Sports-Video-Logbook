@@ -22,41 +22,177 @@ namespace Sports_Video_Logbook.Controllers
             _userManager = userManager;
         }
 
-        // GET: Tarefas
+        // GET: Tarefas/Index - Para professores: tarefas criadas | Para alunos: LogBook (tarefas concluídas/expiradas)
         public async Task<IActionResult> Index(string search, string uc)
         {
-            // Obter o utilizador atual
+            // Verificar se o usuário está logado
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser == null)
             {
                 return Unauthorized();
             }
-            
-            // Filtrar apenas tarefas criadas pelo utilizador atual
+
             var query = _context.Tarefas
                 .Include(t => t.Professor)
-                .Include(t => t.Turma)
+                .Include(t => t.Aluno)
                 .Include(t => t.UC)
-                .Where(t => t.ProfessorId == currentUser.Id)
+                .Include(t => t.TarefaSkills)
+                .ThenInclude(ts => ts.Skill)
                 .AsQueryable();
-            
+
+            List<dynamic> ucsList;
+
+            if (User.IsInRole("Professor"))
+            {
+                // Para professores: mostrar todas as tarefas criadas por eles
+                query = query.Where(t => t.ProfessorId == currentUser.Id);
+                
+                // Carregar UCs disponíveis (todas as UCs)
+                ucsList = await _context.UCs.OrderBy(u => u.Nome).ToListAsync<dynamic>();
+            }
+            else if (User.IsInRole("Aluno"))
+            {
+                // Para alunos: LogBook - apenas tarefas CONCLUÍDAS e EXPIRADAS
+                query = query.Where(t => t.AlunoId == currentUser.Id && 
+                               (t.Concluida || (!t.Concluida && t.DataFim < DateTime.Now)));
+                
+                // Ordenar por data de conclusão/expiração (mais recentes primeiro)
+                query = query.OrderByDescending(t => t.Concluida).ThenByDescending(t => t.DataFim);
+                
+                // Carregar UCs disponíveis (apenas das tarefas do logbook)
+                ucsList = await _context.Tarefas
+                    .Include(t => t.UC)
+                    .Where(t => t.AlunoId == currentUser.Id && 
+                               (t.Concluida || (!t.Concluida && t.DataFim < DateTime.Now)))
+                    .Select(t => t.UC)
+                    .Distinct()
+                    .Where(uc => uc != null)
+                    .OrderBy(uc => uc.Nome)
+                    .ToListAsync<dynamic>();
+            }
+            else
+            {
+                return Forbid();
+            }
+
             // Aplicar filtro de pesquisa por título
             if (!string.IsNullOrEmpty(search))
             {
                 query = query.Where(t => t.Titulo.Contains(search));
             }
-            
+
             // Aplicar filtro por UC
             if (!string.IsNullOrEmpty(uc) && int.TryParse(uc, out int ucId))
             {
                 query = query.Where(t => t.UCId == ucId);
             }
-            
-            // Carregar dados para os dropdowns de filtro
-            ViewBag.UCsDisponiveis = await _context.UCs.OrderBy(u => u.Nome).ToListAsync();
-            ViewBag.TurmasDisponiveis = await _context.Turmas.OrderBy(t => t.Nome).ToListAsync();
-            
+
+            ViewBag.UCsDisponiveis = ucsList;
+            ViewBag.SearchValue = search;
+            ViewBag.UCValue = uc;
+
             return View(await query.ToListAsync());
+        }
+
+        // GET: Tarefas/MinhasTarefas - Para alunos verem suas tarefas atribuídas
+        public async Task<IActionResult> MinhasTarefas(string search, string uc)
+        {
+            // Verificar se o usuário está logado
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null)
+            {
+                return Unauthorized();
+            }
+
+            // Verificar se o usuário é um aluno
+            if (!User.IsInRole("Aluno"))
+            {
+                return Forbid();
+            }
+
+            // Obter apenas tarefas PENDENTES atribuídas ao aluno atual
+            // (não concluídas e ainda dentro do prazo)
+            var query = _context.Tarefas
+                .Include(t => t.Professor)
+                .Include(t => t.UC)
+                .Include(t => t.TarefaSkills)
+                .ThenInclude(ts => ts.Skill)
+                .Where(t => t.AlunoId == currentUser.Id && 
+                           !t.Concluida && 
+                           t.DataFim >= DateTime.Now)
+                .AsQueryable();
+
+            // Aplicar filtro de pesquisa por título
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(t => t.Titulo.Contains(search));
+            }
+
+            // Aplicar filtro por UC
+            if (!string.IsNullOrEmpty(uc) && int.TryParse(uc, out int ucId))
+            {
+                query = query.Where(t => t.UCId == ucId);
+            }
+
+            // Ordenar por data de fim (mais próximas primeiro)
+            query = query.OrderBy(t => t.DataFim);
+
+            // Carregar dados para o dropdown de UC (apenas das tarefas pendentes)
+            var ucsList = await _context.Tarefas
+                .Include(t => t.UC)
+                .Where(t => t.AlunoId == currentUser.Id && 
+                           !t.Concluida && 
+                           t.DataFim >= DateTime.Now)
+                .Select(t => t.UC)
+                .Distinct()
+                .Where(uc => uc != null)
+                .OrderBy(uc => uc.Nome)
+                .ToListAsync();
+            
+            ViewBag.UCsDisponiveis = ucsList;
+            ViewBag.SearchValue = search;
+            ViewBag.UCValue = uc;
+
+            return View(await query.ToListAsync());
+        }
+
+        // POST: Tarefas/CompletarTarefa/5 - Para marcar tarefa como concluída
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CompletarTarefa(int id)
+        {
+            // Verificar se o usuário está logado
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null)
+            {
+                return Unauthorized();
+            }
+
+            // Verificar se o usuário é um aluno
+            if (!User.IsInRole("Aluno"))
+            {
+                return Forbid();
+            }
+
+            var tarefa = await _context.Tarefas.FindAsync(id);
+            if (tarefa == null)
+            {
+                return NotFound();
+            }
+
+            // Verificar se a tarefa pertence ao aluno atual
+            if (tarefa.AlunoId != currentUser.Id)
+            {
+                return Forbid();
+            }
+
+            // Marcar como concluída
+            tarefa.Concluida = true;
+            _context.Update(tarefa);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Tarefa marcada como concluída!";
+            return RedirectToAction(nameof(MinhasTarefas));
         }
 
         // GET: Tarefas/Details/5
@@ -290,7 +426,11 @@ namespace Sports_Video_Logbook.Controllers
                 return NotFound();
             }
 
-            var tarefa = await _context.Tarefas.FindAsync(id);
+            var tarefa = await _context.Tarefas
+                .Include(t => t.Aluno)
+                .Include(t => t.Professor)
+                .Include(t => t.UC)
+                .FirstOrDefaultAsync(t => t.Id == id);
             if (tarefa == null)
             {
                 return NotFound();
@@ -308,7 +448,7 @@ namespace Sports_Video_Logbook.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Titulo,Descricao,DataInicio,DataFim,Concluida,ProfessorId,TurmaNome,UCId")] Tarefa tarefa)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Titulo,Descricao,DataInicio,DataFim,Concluida,ProfessorId,TurmaNome,UCId,AlunoId,TurmaUCId")] Tarefa tarefa)
         {
             if (id != tarefa.Id)
             {
@@ -372,10 +512,16 @@ namespace Sports_Video_Logbook.Controllers
             var tarefa = await _context.Tarefas.FindAsync(id);
             if (tarefa != null)
             {
+                var tituloTarefa = tarefa.Titulo;
                 _context.Tarefas.Remove(tarefa);
+                await _context.SaveChangesAsync();
+                TempData["Success"] = $"A tarefa \"{tituloTarefa}\" foi removida com sucesso.";
+            }
+            else
+            {
+                TempData["Error"] = "Tarefa não encontrada.";
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
