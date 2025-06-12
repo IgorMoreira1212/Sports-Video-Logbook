@@ -79,6 +79,10 @@
                     </td>
                     <td class="skills-td skills-td-action">
                         <a asp-action="Details" asp-route-id="@item.Id" class="skills-details-btn">DETALHES</a>
+                        @if (!item.Concluida)
+                        {
+                            <a asp-action="Submeter" asp-route-id="@item.Id" class="skills-details-btn" style="background-color: #67432F; color: white; margin-left: 8px;">SUBMETER</a>
+                        }
                         
                         <form asp-action="CompletarTarefa" asp-route-id="@item.Id" method="post" style="display:inline;">
                             <button type="submit" class="skills-details-btn" onclick="return confirm('Tem certeza que deseja marcar esta tarefa como concluída?')" style="background-color: #1e7e34; border-color: #1e7e34; padding: 8px 20px; min-width: 120px; text-align: center; vertical-align: middle; display: inline-block;">

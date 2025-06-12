@@ -44,52 +44,11 @@
                         </button>
                     </div>
                     <div class="login-links mt-4">
-                        <a id="forgot-password" asp-page="./ForgotPassword" class="login-link">
-                            <i class="bi bi-question-circle me-1"></i>Forgot your password?
-                        </a>
-                        <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="login-link">
-                            <i class="bi bi-person-plus me-1"></i>Register as a new user
-                        </a>
-                        <a id="resend-confirmation" asp-page="./ResendEmailConfirmation" class="login-link">
-                            <i class="bi bi-envelope me-1"></i>Resend email confirmation
-                        </a>
+                        <!-- Links removidos: Forgot your password, Register, Resend email confirmation -->
                     </div>
                 </form>
             </div>
             
-            <div class="login-divider">
-                <span>OR</span>
-            </div>
-            
-            <div class="external-login">
-                <h3 class="external-login-title">Use another service</h3>
-                @{
-                    if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                    {
-                        <div class="external-login-message">
-                            <p>
-                                <i class="bi bi-info-circle me-2"></i>
-                                No external authentication services configured.
-                            </p>
-                        </div>
-                    }
-                    else
-                    {
-                        <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                            <div class="external-buttons">
-                                @foreach (var provider in Model.ExternalLogins!)
-                                {
-                                    <button type="submit" class="btn btn-outline-secondary external-login-button" 
-                                            name="provider" value="@provider.Name" 
-                                            title="Log in using your @provider.DisplayName account">
-                                        @provider.DisplayName
-                                    </button>
-                                }
-                            </div>
-                        </form>
-                    }
-                }
-            </div>
         </div>
     </div>
 </div>

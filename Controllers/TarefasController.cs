@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Sports_Video_Logbook.Data;
 using Sports_Video_Logbook.Models;
+using Microsoft.AspNetCore.Http;
+using System.IO;
 
 namespace Sports_Video_Logbook.Controllers
 {
@@ -110,16 +112,15 @@ namespace Sports_Video_Logbook.Controllers
                 return Forbid();
             }
 
-            // Obter apenas tarefas PENDENTES atribuídas ao aluno atual
-            // (não concluídas e ainda dentro do prazo)
+            // Obter apenas tarefas PENDENTES OU EXPIRADAS atribuídas ao aluno atual
+            // (não concluídas)
             var query = _context.Tarefas
                 .Include(t => t.Professor)
                 .Include(t => t.UC)
                 .Include(t => t.TarefaSkills)
                 .ThenInclude(ts => ts.Skill)
                 .Where(t => t.AlunoId == currentUser.Id && 
-                           !t.Concluida && 
-                           t.DataFim >= DateTime.Now)
+                           !t.Concluida)
                 .AsQueryable();
 
             // Aplicar filtro de pesquisa por título
@@ -137,12 +138,11 @@ namespace Sports_Video_Logbook.Controllers
             // Ordenar por data de fim (mais próximas primeiro)
             query = query.OrderBy(t => t.DataFim);
 
-            // Carregar dados para o dropdown de UC (apenas das tarefas pendentes)
+            // Carregar dados para o dropdown de UC (apenas das tarefas não concluídas)
             var ucsList = await _context.Tarefas
                 .Include(t => t.UC)
                 .Where(t => t.AlunoId == currentUser.Id && 
-                           !t.Concluida && 
-                           t.DataFim >= DateTime.Now)
+                           !t.Concluida)
                 .Select(t => t.UC)
                 .Distinct()
                 .Where(uc => uc != null)
@@ -186,7 +186,7 @@ namespace Sports_Video_Logbook.Controllers
                 return Forbid();
             }
 
-            // Marcar como concluída
+            // Marcar tarefa como concluída
             tarefa.Concluida = true;
             _context.Update(tarefa);
             await _context.SaveChangesAsync();
@@ -573,6 +573,91 @@ namespace Sports_Video_Logbook.Controllers
             }
             
             return alunosInfo.OrderBy(a => a.UserName).ToList();
+        }
+
+        // GET: Tarefas/Submeter/5
+        public async Task<IActionResult> Submeter(int id)
+        {
+            var tarefa = await _context.Tarefas.FindAsync(id);
+            if (tarefa == null) return NotFound();
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null || tarefa.AlunoId != currentUser.Id) return Forbid();
+            var vm = new SubmissaoTarefaViewModel { TarefaId = id };
+            return View(vm);
+        }
+
+        // POST: Tarefas/Submeter/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Submeter(SubmissaoTarefaViewModel vm)
+        {
+            var tarefa = await _context.Tarefas.FindAsync(vm.TarefaId);
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (tarefa == null || currentUser == null || tarefa.AlunoId != currentUser.Id) return Forbid();
+            if (!ModelState.IsValid) return View(vm);
+
+            var submissao = new SubmissaoTarefa
+            {
+                TarefaId = vm.TarefaId,
+                AlunoId = currentUser.Id,
+                Texto = vm.Texto,
+                DataSubmissao = DateTime.Now
+            };
+            _context.Add(submissao);
+            await _context.SaveChangesAsync();
+
+            // Guardar ficheiros
+            if (vm.Ficheiros != null && vm.Ficheiros.Count > 0)
+            {
+                var uploadDir = Path.Combine("wwwroot", "uploads");
+                if (!Directory.Exists(uploadDir))
+                {
+                    Directory.CreateDirectory(uploadDir);
+                }
+                foreach (var file in vm.Ficheiros)
+                {
+                    if (file.Length > 0)
+                    {
+                        var ext = Path.GetExtension(file.FileName).ToLower();
+                        var tipo = ext == ".jpg" || ext == ".jpeg" || ext == ".png" ? "imagem" :
+                                   ext == ".mp4" || ext == ".mov" ? "video" : "documento";
+                        var fileName = $"submissao_{submissao.Id}_{Guid.NewGuid()}{ext}";
+                        var path = Path.Combine(uploadDir, fileName);
+                        using (var stream = new FileStream(path, FileMode.Create))
+                        {
+                            await file.CopyToAsync(stream);
+                        }
+                        _context.Add(new SubmissaoFicheiro
+                        {
+                            SubmissaoTarefaId = submissao.Id,
+                            Caminho = "/uploads/" + fileName,
+                            Tipo = tipo
+                        });
+                    }
+                }
+            }
+            // Marcar tarefa como concluída e guardar tudo
+            tarefa.Concluida = true;
+            _context.Update(tarefa);
+            await _context.SaveChangesAsync();
+            TempData["Success"] = "Submissão efetuada com sucesso!";
+            return RedirectToAction("MinhasTarefas");
+        }
+
+        // GET: Tarefas/VerSubmissoes/5
+        public async Task<IActionResult> VerSubmissoes(int id)
+        {
+            var tarefa = await _context.Tarefas.Include(t => t.UC).FirstOrDefaultAsync(t => t.Id == id);
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (tarefa == null || currentUser == null || tarefa.ProfessorId != currentUser.Id) return Forbid();
+            var submissoes = await _context.Set<SubmissaoTarefa>()
+                .Include(s => s.Aluno)
+                .Include(s => s.Ficheiros)
+                .Where(s => s.TarefaId == id)
+                .OrderByDescending(s => s.DataSubmissao)
+                .ToListAsync();
+            ViewBag.Tarefa = tarefa;
+            return View(submissoes);
         }
     }
 }

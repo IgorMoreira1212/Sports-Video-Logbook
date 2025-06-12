@@ -1,0 +1,52 @@
+@model IEnumerable<Sports_Video_Logbook.Models.SubmissaoTarefa>
+@{
+    ViewData["Title"] = "Submissões dos Alunos";
+    var tarefa = ViewBag.Tarefa as Sports_Video_Logbook.Models.Tarefa;
+}
+<div class="skills-card">
+    <h2 style="color: #67432F; font-family: Georgia, serif; margin-bottom: 20px;">Submissões dos Alunos</h2>
+    <div style="margin-bottom: 18px;">
+        <strong>Tarefa:</strong> @tarefa?.Titulo <br />
+        <strong>UC:</strong> @tarefa?.UC?.Nome
+    </div>
+    @if (!Model.Any()) {
+        <div class="alert alert-info">Nenhuma submissão encontrada para esta tarefa.</div>
+    } else {
+        <table class="skills-table">
+            <thead>
+                <tr>
+                    <th class="skills-th">Aluno</th>
+                    <th class="skills-th">Data</th>
+                    <th class="skills-th">Texto</th>
+                    <th class="skills-th">Ficheiros</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var sub in Model) {
+                <tr>
+                    <td class="skills-td">@sub.Aluno?.UserName</td>
+                    <td class="skills-td">@sub.DataSubmissao.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td class="skills-td">@sub.Texto</td>
+                    <td class="skills-td">
+                        @if (sub.Ficheiros != null && sub.Ficheiros.Any()) {
+                            <ul style="padding-left: 18px;">
+                            @foreach (var f in sub.Ficheiros) {
+                                <li>
+                                    <a href="@f.Caminho" target="_blank">@System.IO.Path.GetFileName(f.Caminho)</a>
+                                    <span style="font-size: 0.9em; color: #888;">(@f.Tipo)</span>
+                                </li>
+                            }
+                            </ul>
+                        } else {
+                            <span style="color: #888;">Nenhum ficheiro</span>
+                        }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+    <div style="margin-top: 18px;">
+        <a asp-action="Index" class="skills-modal-cancel">VOLTAR</a>
+    </div>
+</div> 
