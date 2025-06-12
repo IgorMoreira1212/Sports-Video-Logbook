@@ -1,66 +1,79 @@
 ﻿@model Sports_Video_Logbook.Models.Tarefa
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalhes da Tarefa";
 }
 
-<h1>Details</h1>
-
-<div>
-    <h4>Tarefa</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Titulo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Titulo)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Descricao)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Descricao)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DataInicio)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DataInicio)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DataFim)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DataFim)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Concluida)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Concluida)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Professor)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Professor.UserName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Turma)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Turma.Nome)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.UC)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.UC.Nome)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+<div class="skills-card">
+    <h2 style="color: #67432F; font-family: Georgia, serif; margin-bottom: 20px;">Detalhes da Tarefa</h2>
+    
+    <div style="display: flex; flex-direction: column; gap: 18px;">
+        <div class="skills-modal-row">
+            <div style="flex: 1;">
+                <label style="color: #67432F; font-family: Georgia, serif; font-weight: 500; margin-bottom: 5px; display: block;">Título</label>
+                <div style="padding: 12px 16px; border-radius: 8px; border: 2px solid #b9b9b9; background: #f7f7f7; color: #67432F; font-family: Georgia, serif;">
+                    @Html.DisplayFor(model => model.Titulo)
+                </div>
+            </div>
+        </div>
+        
+        <div class="skills-modal-row">
+            <div style="flex: 1;">
+                <label style="color: #67432F; font-family: Georgia, serif; font-weight: 500; margin-bottom: 5px; display: block;">Descrição</label>
+                <div style="padding: 12px 16px; border-radius: 8px; border: 2px solid #b9b9b9; background: #f7f7f7; color: #67432F; font-family: Georgia, serif; min-height: 80px;">
+                    @Html.DisplayFor(model => model.Descricao)
+                </div>
+            </div>
+        </div>
+        
+        <div class="skills-modal-row">
+            <div style="flex: 1;">
+                <label style="color: #67432F; font-family: Georgia, serif; font-weight: 500; margin-bottom: 5px; display: block;">Data de Início</label>
+                <div style="padding: 12px 16px; border-radius: 8px; border: 2px solid #b9b9b9; background: #f7f7f7; color: #67432F; font-family: Georgia, serif;">
+                    @Model.DataInicio.ToString("dd-MM-yyyy HH:mm")
+                </div>
+            </div>
+            <div style="flex: 1;">
+                <label style="color: #67432F; font-family: Georgia, serif; font-weight: 500; margin-bottom: 5px; display: block;">Data Limite para Submissão</label>
+                <div style="padding: 12px 16px; border-radius: 8px; border: 2px solid #b9b9b9; background: #f7f7f7; color: #67432F; font-family: Georgia, serif;">
+                    @Model.DataFim.ToString("dd-MM-yyyy HH:mm")
+                </div>
+            </div>
+        </div>
+        
+        <div class="skills-modal-row">
+            <div style="flex: 1;">
+                <label style="color: #67432F; font-family: Georgia, serif; font-weight: 500; margin-bottom: 5px; display: block;">Estado</label>
+                <div style="padding: 12px 16px; border-radius: 8px; border: 2px solid #b9b9b9; background: #f7f7f7; color: #67432F; font-family: Georgia, serif;">
+                    @(Model.Concluida ? "Concluída" : "Pendente")
+                </div>
+            </div>
+            <div style="flex: 1;">
+                <label style="color: #67432F; font-family: Georgia, serif; font-weight: 500; margin-bottom: 5px; display: block;">Professor</label>
+                <div style="padding: 12px 16px; border-radius: 8px; border: 2px solid #b9b9b9; background: #f7f7f7; color: #67432F; font-family: Georgia, serif;">
+                    @Html.DisplayFor(model => model.Professor.UserName)
+                </div>
+            </div>
+        </div>
+        
+        <div class="skills-modal-row">
+            <div style="flex: 1;">
+                <label style="color: #67432F; font-family: Georgia, serif; font-weight: 500; margin-bottom: 5px; display: block;">Turma</label>
+                <div style="padding: 12px 16px; border-radius: 8px; border: 2px solid #b9b9b9; background: #f7f7f7; color: #67432F; font-family: Georgia, serif;">
+                    @Html.DisplayFor(model => model.Turma.Nome)
+                </div>
+            </div>
+            <div style="flex: 1;">
+                <label style="color: #67432F; font-family: Georgia, serif; font-weight: 500; margin-bottom: 5px; display: block;">Unidade Curricular</label>
+                <div style="padding: 12px 16px; border-radius: 8px; border: 2px solid #b9b9b9; background: #f7f7f7; color: #67432F; font-family: Georgia, serif;">
+                    @Html.DisplayFor(model => model.UC.Nome)
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="skills-modal-btns" style="margin-top: 30px;">
+        <a asp-action="Edit" asp-route-id="@Model?.Id" class="skills-modal-submit" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">EDITAR</a>
+        <a asp-action="Index" class="skills-modal-cancel">VOLTAR À LISTA</a>
+    </div>
 </div>

@@ -46,6 +46,21 @@
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Tarefas" asp-action="Index">Tarefas Atribuídas</a>
                             </li>
                         }
+                        @if (User.IsInRole("Aluno"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Tarefas" asp-action="Index">Completar Tarefa</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Tarefas" asp-action="Index">LogBook</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Skills" asp-action="Index">Skills</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Skills" asp-action="Index">Certificado</a>
+                            </li>
+                        }
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>

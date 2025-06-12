@@ -804,6 +804,7 @@ a:hover {
     height: 32px;
     text-align: center;
     line-height: 20px;
+    vertical-align: middle;
 }
 .skills-remove-btn:hover {
     background: #7a0000;
@@ -1082,6 +1083,7 @@ a:hover {
     height: 32px;
     text-align: center;
     line-height: 20px;
+    vertical-align: middle;
 }
 
 .skills-edit-btn:hover {
@@ -1091,24 +1093,29 @@ a:hover {
 }
 
 .skills-details-btn {
-    background: #2e5c8a;
+    background: #67432F;
     color: #fff !important;
     border: none;
-    border-radius: 8px;
-    padding: 7px 15px;
-    font-size: 0.9rem;
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 0.85rem;
     font-family: Georgia, serif;
     font-weight: 500;
     cursor: pointer;
     transition: background 0.2s;
-    margin-right: 8px;
+    margin-right: 0;
     text-decoration: none;
     display: inline-block;
-    box-shadow: 0 2px 8px rgba(46,92,138,0.08);
+    box-shadow: 0 2px 6px rgba(103,67,47,0.12);
+    width: 90px;
+    height: 32px;
+    text-align: center;
+    line-height: 20px;
+    vertical-align: middle;
 }
 
 .skills-details-btn:hover {
-    background: #1e3d5c;
+    background: #4a2f21;
     color: #fff !important;
     text-decoration: none;
 }
@@ -1116,25 +1123,22 @@ a:hover {
 /* Ajustar coluna de ação das UCs para acomodar apenas o botão remover */
 .skills-th-action {
     text-align: center;
-    width: 200px;
-    min-width: 180px;
-    max-width: 220px;
+    width: 220px;
+    min-width: 200px;
+    max-width: 240px;
     vertical-align: middle;
-    padding-right: 0;
-    padding-left: 0;
-    padding-bottom: 0;
+    padding: 12px 8px !important;
+    line-height: 32px !important;
 }
 
 .skills-td-action {
     text-align: center;
-    width: 200px;
-    min-width: 180px;
-    max-width: 220px;
+    width: 220px;
+    min-width: 200px;
+    max-width: 240px;
     vertical-align: middle;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 6px !important;
+    padding: 12px 8px !important;
+    line-height: 32px !important;
 }
 
 /* Estilizar a coluna Nº Turmas das UCs */
@@ -1164,6 +1168,24 @@ a:hover {
     vertical-align: middle !important;
 }
 
+/* Garantir alinhamento vertical perfeito de todos os botões */
+.skills-td-action .skills-details-btn,
+.skills-td-action .skills-remove-btn {
+    vertical-align: middle !important;
+    display: inline-block !important;
+    margin: 0 !important;
+}
+
+/* --- Ajuste da largura da coluna Tarefa --- */
+.skills-table th:first-child,
+.skills-table td:first-child {
+    width: 35%;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 /* --- Customização para pesquisa de tarefas --- */
 #tarefaSearchForm {
     display: flex !important;
@@ -1191,4 +1213,25 @@ a:hover {
     height: 42px !important;
     min-height: 42px !important;
     max-height: 42px !important;
+}
+
+/* --- Ajustes específicos para a tabela de utilizadores --- */
+/* Remover negrito e garantir uma só linha para todas as células */
+.skills-table .skills-td {
+    font-weight: normal !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* --- Ajustes específicos para a página de Skills (UCs) --- */
+/* Mover coluna "Ação" mais para a direita apenas na página de Skills */
+body:has([asp-controller="Skills"]) .skills-th-action,
+[data-page="skills"] .skills-th-action {
+    padding: 12px 8px 12px 308px !important;
+}
+
+body:has([asp-controller="Skills"]) .skills-td-action,
+[data-page="skills"] .skills-td-action {
+    padding: 12px 8px 12px 308px !important;
 } 

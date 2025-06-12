@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Sports_Video_Logbook.Data;
 using Sports_Video_Logbook.Models;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,7 +33,7 @@ builder.Services.Configure<IdentityOptions>(options =>
 
     //user settings
     options.User.AllowedUserNameCharacters =
-    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_@#";
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_@# ";
     options.User.RequireUniqueEmail = true;
 });
 
@@ -46,6 +47,15 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<RoleManager<IdentityRole>>();
 
 var app = builder.Build();
+
+// Configurar cultura para formato de data personalizado
+var cultureInfo = new CultureInfo("pt-PT");
+cultureInfo.DateTimeFormat.ShortDatePattern = "dd-MM-yyyy";
+cultureInfo.DateTimeFormat.LongDatePattern = "dd-MM-yyyy HH:mm";
+cultureInfo.DateTimeFormat.ShortTimePattern = "HH:mm";
+cultureInfo.DateTimeFormat.LongTimePattern = "HH:mm:ss";
+CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
 using (var scope = app.Services.CreateScope())
 {

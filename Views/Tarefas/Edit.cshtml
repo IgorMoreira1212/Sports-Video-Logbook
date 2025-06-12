@@ -1,74 +1,115 @@
 ﻿@model Sports_Video_Logbook.Models.Tarefa
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar Tarefa";
 }
 
-<h1>Edit</h1>
-
-<h4>Tarefa</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="Titulo" class="control-label"></label>
-                <input asp-for="Titulo" class="form-control" />
-                <span asp-validation-for="Titulo" class="text-danger"></span>
+<div class="skills-card">
+    <h2 style="color: #67432F; font-family: Georgia, serif; margin-bottom: 20px;">Editar Tarefa</h2>
+    
+    <form asp-action="Edit" class="skills-modal-form">
+        <div asp-validation-summary="ModelOnly" class="skills-modal-error"></div>
+        <input type="hidden" asp-for="Id" />
+        
+        <div class="skills-modal-row">
+            <div style="flex: 1;">
+                <label asp-for="Titulo" class="control-label" style="color: #67432F; font-family: Georgia, serif; font-weight: 500; margin-bottom: 5px; display: block;">Título</label>
+                <input asp-for="Titulo" class="skills-modal-input" />
+                <span asp-validation-for="Titulo" class="skills-modal-error"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Descricao" class="control-label"></label>
-                <input asp-for="Descricao" class="form-control" />
-                <span asp-validation-for="Descricao" class="text-danger"></span>
+        </div>
+        
+        <div class="skills-modal-row">
+            <div style="flex: 1;">
+                <label asp-for="Descricao" class="control-label" style="color: #67432F; font-family: Georgia, serif; font-weight: 500; margin-bottom: 5px; display: block;">Descrição</label>
+                <textarea asp-for="Descricao" class="skills-modal-input" rows="3"></textarea>
+                <span asp-validation-for="Descricao" class="skills-modal-error"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="DataInicio" class="control-label"></label>
-                <input asp-for="DataInicio" class="form-control" />
-                <span asp-validation-for="DataInicio" class="text-danger"></span>
+        </div>
+        
+        <div class="skills-modal-row">
+            <div style="flex: 1;">
+                <label asp-for="DataInicio" class="control-label" style="color: #67432F; font-family: Georgia, serif; font-weight: 500; margin-bottom: 5px; display: block;">Data de Início</label>
+                <div style="padding: 12px 16px; border-radius: 8px; border: 2px solid #b9b9b9; background: #f7f7f7; color: #67432F; font-family: Georgia, serif;">
+                    @Model.DataInicio.ToString("dd-MM-yyyy HH:mm")
+                </div>
+                <input asp-for="DataInicio" type="hidden" />
             </div>
-            <div class="form-group">
-                <label asp-for="DataFim" class="control-label"></label>
-                <input asp-for="DataFim" class="form-control" />
-                <span asp-validation-for="DataFim" class="text-danger"></span>
+            <div style="flex: 1;">
+                <label asp-for="DataFim" class="control-label" style="color: #67432F; font-family: Georgia, serif; font-weight: 500; margin-bottom: 5px; display: block;">Data Limite para Submissão</label>
+                <input asp-for="DataFim" class="skills-modal-input" type="datetime-local" />
+                <span asp-validation-for="DataFim" class="skills-modal-error"></span>
             </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="Concluida" /> @Html.DisplayNameFor(model => model.Concluida)
+        </div>
+        
+        <div class="skills-modal-row">
+            <div style="flex: 1;">
+                <label style="color: #67432F; font-family: Georgia, serif; font-weight: 500; margin-bottom: 5px; display: block;">
+                    <input class="form-check-input" asp-for="Concluida" type="checkbox" style="margin-right: 8px;" /> 
+                    Tarefa Concluída
                 </label>
             </div>
-            <div class="form-group">
-                <label asp-for="ProfessorId" class="control-label"></label>
-                <select asp-for="ProfessorId" class="form-control" asp-items="ViewBag.ProfessorId"></select>
-                <span asp-validation-for="ProfessorId" class="text-danger"></span>
+        </div>
+        
+        <div class="skills-modal-row">
+            <div style="flex: 1;">
+                <label asp-for="ProfessorId" class="control-label" style="color: #67432F; font-family: Georgia, serif; font-weight: 500; margin-bottom: 5px; display: block;">Professor</label>
+                <select asp-for="ProfessorId" class="skills-modal-input" asp-items="ViewBag.ProfessorId">
+                    <option value="">Selecione um professor</option>
+                </select>
+                <span asp-validation-for="ProfessorId" class="skills-modal-error"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="TurmaNome" class="control-label"></label>
-                <select asp-for="TurmaNome" class="form-control" asp-items="ViewBag.TurmaNome"></select>
-                <span asp-validation-for="TurmaNome" class="text-danger"></span>
+            <div style="flex: 1;">
+                <label asp-for="UCId" class="control-label" style="color: #67432F; font-family: Georgia, serif; font-weight: 500; margin-bottom: 5px; display: block;">Unidade Curricular</label>
+                <select asp-for="UCId" class="skills-modal-input" asp-items="ViewBag.UCId">
+                    <option value="">Selecione uma UC</option>
+                </select>
+                <span asp-validation-for="UCId" class="skills-modal-error"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="TurmaUCId" class="control-label"></label>
-                <select asp-for="TurmaUCId" class="form-control" asp-items="ViewBag.TurmaUCId"></select>
-                <span asp-validation-for="TurmaUCId" class="text-danger"></span>
+        </div>
+        
+        <div class="skills-modal-row">
+            <div style="flex: 1;">
+                <label asp-for="TurmaNome" class="control-label" style="color: #67432F; font-family: Georgia, serif; font-weight: 500; margin-bottom: 5px; display: block;">Turma</label>
+                <select asp-for="TurmaNome" class="skills-modal-input" asp-items="ViewBag.TurmaNome">
+                    <option value="">Selecione uma turma</option>
+                </select>
+                <span asp-validation-for="TurmaNome" class="skills-modal-error"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="UCId" class="control-label"></label>
-                <select asp-for="UCId" class="form-control" asp-items="ViewBag.UCId"></select>
-                <span asp-validation-for="UCId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
+        </div>
+        
+        <div class="skills-modal-btns">
+            <button type="submit" class="skills-modal-submit">GUARDAR</button>
+            <a asp-action="Index" class="skills-modal-cancel">CANCELAR</a>
+        </div>
+    </form>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dataInicio = document.querySelector('input[name="DataInicio"]');
+            const dataFim = document.getElementById('DataFim');
+            
+            function validarDatas() {
+                if (dataInicio.value && dataFim.value) {
+                    const inicio = new Date(dataInicio.value);
+                    const fim = new Date(dataFim.value);
+                    
+                    if (fim < inicio) {
+                        dataFim.setCustomValidity('A data limite para submissão não pode ser anterior à data de início.');
+                    } else {
+                        dataFim.setCustomValidity('');
+                    }
+                }
+            }
+            
+            dataFim.addEventListener('change', validarDatas);
+            
+            // Validar no carregamento da página
+            validarDatas();
+        });
+    </script>
 }

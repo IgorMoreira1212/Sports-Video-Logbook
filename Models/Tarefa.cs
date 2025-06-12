@@ -1,7 +1,24 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Sports_Video_Logbook.Models
 {
+    // Atributo de validação customizado para validar datas
+    public class DataFimMaiorQueDataInicioAttribute : ValidationAttribute
+    {
+        protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
+        {
+            var tarefa = (Tarefa)validationContext.ObjectInstance;
+            
+            if (tarefa.DataFim < tarefa.DataInicio)
+            {
+                return new ValidationResult("A data limite para submissão não pode ser anterior à data de início.");
+            }
+            
+            return ValidationResult.Success;
+        }
+    }
+
     public class Tarefa
     {
         [Key]
@@ -13,9 +30,12 @@ namespace Sports_Video_Logbook.Models
         public string? Descricao { get; set; }
 
         [Required]
+        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy HH:mm}", ApplyFormatInEditMode = true)]
         public DateTime DataInicio { get; set; }
 
         [Required]
+        [DataFimMaiorQueDataInicio]
+        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy HH:mm}", ApplyFormatInEditMode = true)]
         public DateTime DataFim { get; set; }
 
         [Required]
@@ -40,6 +60,22 @@ namespace Sports_Video_Logbook.Models
 
         public ICollection<TarefaSkill> TarefaSkills { get; set; } = new List<TarefaSkill>();
         public ICollection<SubmissaoTarefa> Submissoes { get; set; } = new List<SubmissaoTarefa>();
+    }
+
+    // Atributo de validação para o ViewModel também
+    public class DataFimViewModelMaiorQueDataInicioAttribute : ValidationAttribute
+    {
+        protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
+        {
+            var viewModel = (CreateTarefaViewModel)validationContext.ObjectInstance;
+            
+            if (viewModel.DataFim < viewModel.DataInicio)
+            {
+                return new ValidationResult("A data limite para submissão não pode ser anterior à data de início.");
+            }
+            
+            return ValidationResult.Success;
+        }
     }
 
     public class CreateTarefaViewModel
@@ -67,9 +103,11 @@ namespace Sports_Video_Logbook.Models
         public string Descricao { get; set; } = string.Empty;
 
         [Required]
+        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy HH:mm}", ApplyFormatInEditMode = true)]
         public DateTime DataInicio { get; set; } = DateTime.Now;
 
-        [Required]
+        [DataFimViewModelMaiorQueDataInicio]
+        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy HH:mm}", ApplyFormatInEditMode = true)]
         public DateTime DataFim { get; set; } = DateTime.Now.AddDays(7);
 
         // Dados para popular dropdowns
