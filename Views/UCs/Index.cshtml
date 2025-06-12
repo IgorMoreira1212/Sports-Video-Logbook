@@ -9,20 +9,20 @@
         <input id="searchUC" type="text" class="skills-search" placeholder="Pesquisar" />
         <a asp-action="Create" class="skills-add-btn">ADICIONAR UC</a>
     </div>
-    <table class="skills-table">
+    <table class="skills-table" style="width: 100%; table-layout: fixed;">
         <thead>
             <tr>
                 <th class="skills-th">Unidade Curricular</th>
-                <th class="skills-th">Nº Turmas</th>
-                <th class="skills-th skills-th-action">Ação</th>
+                <th class="skills-th" style="width: 120px; min-width: 120px; max-width: 120px; text-align: center;">Nº Turmas</th>
+                <th class="skills-th skills-th-action" style="width: 140px; min-width: 140px; max-width: 140px; text-align: center;">Ação</th>
             </tr>
         </thead>
         <tbody id="ucsList">
         @foreach (var item in Model) {
             <tr class="skill-row">
-                <td class="skills-td">@item.UC.Nome</td>
-                <td class="skills-td" style="text-align: center;">@item.NumeroTurmas</td>
-                <td class="skills-td skills-td-action">
+                <td class="skills-td" style="white-space: normal; word-break: break-word;">@item.UC.Nome</td>
+                <td class="skills-td" style="text-align: center; width: 120px; min-width: 120px; max-width: 120px;">@item.NumeroTurmas</td>
+                <td class="skills-td skills-td-action" style="width: 140px; min-width: 140px; max-width: 140px; text-align: center;">
                     <form asp-action="Delete" asp-route-id="@item.UC.Id" method="post" style="display:inline;">
                         <input type="hidden" name="Id" value="@item.UC.Id" />
                         <button type="submit" class="skills-remove-btn" onclick="return confirm('Tem certeza que deseja remover esta UC?')">REMOVER</button>

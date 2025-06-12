@@ -759,11 +759,8 @@ a:hover {
     background: #4a2f21;
 }
 .skills-table {
+    table-layout: auto;
     width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    background: transparent;
-    font-size: 1rem;
 }
 .skills-th {
     color: #67432F;
@@ -1234,4 +1231,35 @@ body:has([asp-controller="Skills"]) .skills-th-action,
 body:has([asp-controller="Skills"]) .skills-td-action,
 [data-page="skills"] .skills-td-action {
     padding: 12px 8px 12px 308px !important;
+}
+
+.skills-td.skill-name {
+  white-space: normal;
+  word-break: break-word;
+  overflow: visible;
+  text-overflow: unset;
+  display: table-cell;
+}
+
+.skills-th:first-child {
+  width: 80%;
+}
+
+.skills-remove-btn {
+  min-width: 0;
+  width: auto;
+  max-width: 100px;
+}
+
+.skills-table {
+  table-layout: auto;
+  width: 100%;
+}
+
+.skills-th:first-child, .skills-td.skill-name {
+  white-space: normal;
+  word-break: break-word;
+  overflow: visible;
+  text-overflow: unset;
+  display: table-cell;
 } 
