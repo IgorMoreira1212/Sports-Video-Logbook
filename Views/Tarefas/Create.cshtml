@@ -121,6 +121,20 @@
                 </div>
             </div>
             
+            <!-- Sétima linha: Data Limite -->
+            <div class="form-row">
+                <div class="form-col-2">
+                    <input asp-for="DataFim" class="skills-modal-input" type="datetime-local" placeholder="Data Limite para Submissão*" />
+                    <span asp-validation-for="DataFim" class="skills-modal-error"></span>
+                    <div style="color: #d32f2f; font-size: 0.85rem; margin-top: 3px; font-family: Georgia, serif;">
+                        Se não for inserida uma data, ficará automaticamente definida para 7 dias após a criação da tarefa.
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Campo oculto para DataInicio -->
+            <input asp-for="DataInicio" type="hidden" />
+            
             <div asp-validation-summary="All" class="skills-modal-error"></div>
             
             <div class="skills-modal-btns">
@@ -136,14 +150,14 @@
 .skills-modal-card {
     width: 90%;
     max-width: 800px;
-    padding: 25px;
+    padding: 20px;
 }
 
 /* Layout de campos em linha */
 .form-row {
     display: flex;
-    gap: 15px;
-    margin-bottom: 10px;
+    gap: 12px;
+    margin-bottom: 8px;
 }
 
 .form-col {
@@ -156,7 +170,7 @@
 
 .skills-dropdown-container {
     position: relative;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
 }
 
 .skills-dropdown-header {
@@ -243,12 +257,13 @@ select.skills-modal-input {
     .skills-modal-card {
         width: 95%;
         max-width: none;
-        padding: 15px;
+        padding: 12px;
     }
     
     .form-row {
         flex-direction: column;
         gap: 0;
+        margin-bottom: 6px;
     }
     
     .form-col, .form-col-2 {
@@ -332,8 +347,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 cb.checked = false;
                 cb.required = false;
             });
-            // Mudar para seleção única (radio buttons)
-            convertTurmaToRadio();
+            // Manter seleção múltipla (checkboxes) para permitir múltiplas turmas
+            convertTurmaToCheckbox();
             updateTurmaDisplay();
             // Reset alunos
             clearAlunosSelection();
@@ -442,8 +457,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Update turma display
     function updateTurmaDisplay() {
-        // Pegar elementos atuais (checkboxes ou radio buttons)
-        const currentTurmaInputs = document.querySelectorAll('input[name="TurmasSelecionadas"], input[name="TurmaSelecionada"]');
+        // Pegar elementos atuais (sempre checkboxes agora)
+        const currentTurmaInputs = document.querySelectorAll('input[name="TurmasSelecionadas"]');
         const selected = Array.from(currentTurmaInputs)
             .filter(cb => cb.checked)
             .map(cb => cb.nextElementSibling.textContent);
@@ -458,18 +473,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Converter turmas para radio buttons (seleção única)
-    function convertTurmaToRadio() {
-        turmaCheckboxes.forEach(checkbox => {
-            checkbox.type = 'radio';
-            checkbox.name = 'TurmaSelecionada'; // Nome diferente para radio
-            checkbox.checked = false; // Reset selection
-        });
-        // Atualizar referências
-        updateTurmaCheckboxesReference();
-    }
-    
-    // Converter turmas para checkboxes (seleção múltipla)
+    // Garantir que turmas sejam checkboxes (seleção múltipla)
     function convertTurmaToCheckbox() {
         turmaCheckboxes.forEach(checkbox => {
             checkbox.type = 'checkbox';
@@ -482,7 +486,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Atualizar referências dos checkboxes após conversão
     function updateTurmaCheckboxesReference() {
-        const newTurmaCheckboxes = document.querySelectorAll('input[name="TurmasSelecionadas"], input[name="TurmaSelecionada"]');
+        const newTurmaCheckboxes = document.querySelectorAll('input[name="TurmasSelecionadas"]');
         
         // Remover listeners antigos
         turmaCheckboxes.forEach(checkbox => {
@@ -508,7 +512,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Função para carregar alunos baseado na turma selecionada
     function carregarAlunosPorTurma() {
-        const turmasSelecionadas = Array.from(document.querySelectorAll('input[name="TurmaSelecionada"]:checked, input[name="TurmasSelecionadas"]:checked'))
+        const turmasSelecionadas = Array.from(document.querySelectorAll('input[name="TurmasSelecionadas"]:checked'))
             .map(cb => cb.value);
         
         // Limpar alunos
@@ -530,8 +534,13 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
+        // Remover duplicatas (caso um aluno esteja em múltiplas turmas selecionadas)
+        const alunosUnicos = alunosFiltrados.filter((aluno, index, self) => 
+            index === self.findIndex(a => a.id === aluno.id)
+        );
+        
         // Criar opções para alunos
-        alunosFiltrados.forEach(aluno => {
+        alunosUnicos.forEach(aluno => {
             const option = document.createElement('label');
             option.className = 'skills-option aluno-option';
             option.innerHTML = `
@@ -605,4 +614,40 @@ document.addEventListener('DOMContentLoaded', function() {
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dataInicio = document.getElementById('DataInicio');
+            const dataFim = document.getElementById('DataFim');
+            
+            // Definir DataInicio como o momento atual
+            const agora = new Date();
+            const agoraFormatado = agora.toISOString().slice(0, 16); // Formato YYYY-MM-DDTHH:MM
+            dataInicio.value = agoraFormatado;
+            
+            // Definir valor mínimo para DataFim como o momento atual
+            dataFim.min = agoraFormatado;
+            
+            function validarDatas() {
+                if (dataFim.value) {
+                    const inicio = new Date(dataInicio.value);
+                    const fim = new Date(dataFim.value);
+                    
+                    if (fim < inicio) {
+                        dataFim.setCustomValidity('A data limite para submissão não pode ser anterior à data de início.');
+                    } else {
+                        dataFim.setCustomValidity('');
+                    }
+                } else {
+                    // Se não há valor, limpar qualquer erro de validação
+                    dataFim.setCustomValidity('');
+                }
+            }
+            
+            dataFim.addEventListener('change', validarDatas);
+            
+            // Validar no carregamento da página
+            validarDatas();
+        });
+    </script>
 }

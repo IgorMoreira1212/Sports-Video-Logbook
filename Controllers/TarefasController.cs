@@ -25,7 +25,20 @@ namespace Sports_Video_Logbook.Controllers
         // GET: Tarefas
         public async Task<IActionResult> Index(string search, string uc)
         {
-            var query = _context.Tarefas.Include(t => t.Professor).Include(t => t.Turma).Include(t => t.UC).AsQueryable();
+            // Obter o utilizador atual
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null)
+            {
+                return Unauthorized();
+            }
+            
+            // Filtrar apenas tarefas criadas pelo utilizador atual
+            var query = _context.Tarefas
+                .Include(t => t.Professor)
+                .Include(t => t.Turma)
+                .Include(t => t.UC)
+                .Where(t => t.ProfessorId == currentUser.Id)
+                .AsQueryable();
             
             // Aplicar filtro de pesquisa por título
             if (!string.IsNullOrEmpty(search))
@@ -80,6 +93,15 @@ namespace Sports_Video_Logbook.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateTarefaViewModel viewModel)
         {
+            // Garantir que a DataInicio seja sempre o momento atual
+            viewModel.DataInicio = DateTime.Now;
+            
+            // Se não foi fornecida uma DataFim, definir para 7 dias após a criação
+            if (viewModel.DataFim == default(DateTime) || viewModel.DataFim <= viewModel.DataInicio)
+            {
+                viewModel.DataFim = viewModel.DataInicio.AddDays(7);
+            }
+            
             if (ModelState.IsValid)
             {
                 var currentUser = await _userManager.GetUserAsync(User);
@@ -95,9 +117,9 @@ namespace Sports_Video_Logbook.Controllers
                     {
                         ModelState.AddModelError("AlunosSelecionados", "Deve selecionar pelo menos um aluno quando atribuir a alunos específicos");
                     }
-                    if (string.IsNullOrEmpty(viewModel.TurmaSelecionada))
+                    if (!viewModel.TurmasSelecionadas.Any())
                     {
-                        ModelState.AddModelError("TurmaSelecionada", "Deve selecionar uma turma quando atribuir a alunos específicos");
+                        ModelState.AddModelError("TurmasSelecionadas", "Deve selecionar pelo menos uma turma quando atribuir a alunos específicos");
                     }
                 }
 
@@ -163,32 +185,40 @@ namespace Sports_Video_Logbook.Controllers
                         // Para múltiplos alunos, criar uma tarefa para cada aluno selecionado
                         foreach (var alunoId in viewModel.AlunosSelecionados)
                         {
-                            var tarefaAluno = new Tarefa
-                            {
-                                Titulo = viewModel.Nome,
-                                Descricao = viewModel.Descricao,
-                                DataInicio = viewModel.DataInicio,
-                                DataFim = viewModel.DataFim,
-                                Concluida = false,
-                                ProfessorId = currentUser.Id,
-                                AlunoId = alunoId,
-                                TurmaNome = viewModel.TurmaSelecionada,
-                                TurmaUCId = viewModel.UCId,
-                                UCId = viewModel.UCId
-                            };
+                            // Obter a turma do aluno nesta UC (das turmas selecionadas)
+                            var inscricaoAluno = await _context.InscricoesUC
+                                .FirstOrDefaultAsync(i => i.AlunoId == alunoId && i.UCId == viewModel.UCId && 
+                                                         viewModel.TurmasSelecionadas.Contains(i.TurmaNome));
 
-                            _context.Add(tarefaAluno);
-                            await _context.SaveChangesAsync();
-
-                            // Associar skills à tarefa
-                            foreach (var skillId in viewModel.SkillsSelecionadas)
+                            if (inscricaoAluno != null)
                             {
-                                var tarefaSkill = new TarefaSkill
+                                var tarefaAluno = new Tarefa
                                 {
-                                    TarefaId = tarefaAluno.Id,
-                                    SkillId = skillId
+                                    Titulo = viewModel.Nome,
+                                    Descricao = viewModel.Descricao,
+                                    DataInicio = viewModel.DataInicio,
+                                    DataFim = viewModel.DataFim,
+                                    Concluida = false,
+                                    ProfessorId = currentUser.Id,
+                                    AlunoId = alunoId,
+                                    TurmaNome = inscricaoAluno.TurmaNome,
+                                    TurmaUCId = viewModel.UCId,
+                                    UCId = viewModel.UCId
                                 };
-                                _context.TarefaSkills.Add(tarefaSkill);
+
+                                _context.Add(tarefaAluno);
+                                await _context.SaveChangesAsync();
+
+                                // Associar skills à tarefa
+                                foreach (var skillId in viewModel.SkillsSelecionadas)
+                                {
+                                    var tarefaSkill = new TarefaSkill
+                                    {
+                                        TarefaId = tarefaAluno.Id,
+                                        SkillId = skillId
+                                    };
+                                    _context.TarefaSkills.Add(tarefaSkill);
+                                }
                             }
                         }
                     }
@@ -265,7 +295,9 @@ namespace Sports_Video_Logbook.Controllers
             {
                 return NotFound();
             }
-            ViewData["ProfessorId"] = new SelectList(_context.Users, "Id", "Id", tarefa.ProfessorId);
+            
+            var professores = await _userManager.GetUsersInRoleAsync("Professor");
+            ViewData["ProfessorId"] = new SelectList(professores.OrderBy(p => p.UserName), "Id", "UserName", tarefa.ProfessorId);
             ViewData["TurmaNome"] = new SelectList(_context.Turmas, "Nome", "Nome", tarefa.TurmaNome);
             ViewData["UCId"] = new SelectList(_context.UCs, "Id", "Nome", tarefa.UCId);
             return View(tarefa);
@@ -276,7 +308,7 @@ namespace Sports_Video_Logbook.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Titulo,Descricao,DataInicio,DataFim,Concluida,ProfessorId,TurmaNome,TurmaUCId,UCId")] Tarefa tarefa)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Titulo,Descricao,DataInicio,DataFim,Concluida,ProfessorId,TurmaNome,UCId")] Tarefa tarefa)
         {
             if (id != tarefa.Id)
             {
@@ -303,7 +335,9 @@ namespace Sports_Video_Logbook.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ProfessorId"] = new SelectList(_context.Users, "Id", "Id", tarefa.ProfessorId);
+            
+            var professores = await _userManager.GetUsersInRoleAsync("Professor");
+            ViewData["ProfessorId"] = new SelectList(professores.OrderBy(p => p.UserName), "Id", "UserName", tarefa.ProfessorId);
             ViewData["TurmaNome"] = new SelectList(_context.Turmas, "Nome", "Nome", tarefa.TurmaNome);
             ViewData["UCId"] = new SelectList(_context.UCs, "Id", "Nome", tarefa.UCId);
             return View(tarefa);

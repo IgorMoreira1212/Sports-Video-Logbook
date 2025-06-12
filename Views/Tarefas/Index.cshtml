@@ -31,7 +31,7 @@
                 <td class="skills-td">@item.Titulo</td>
                 <td class="skills-td">@(item.UC?.Nome ?? "N/A")</td>
                 <td class="skills-td skills-td-action">
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="skills-edit-btn">EDITAR</a>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="skills-details-btn">DETALHES</a>
                     <form asp-action="Delete" asp-route-id="@item.Id" method="post" style="display:inline;">
                         <input type="hidden" name="Id" value="@item.Id" />
                         <button type="submit" class="skills-remove-btn" onclick="return confirm('Tem certeza que deseja remover esta tarefa?')">REMOVER</button>
