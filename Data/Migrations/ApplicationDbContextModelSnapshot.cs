@@ -198,8 +198,8 @@ namespace Sports_Video_Logbook.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("Nota")
-                        .HasColumnType("int");
+                    b.Property<double>("Nota")
+                        .HasColumnType("float");
 
                     b.Property<int>("SkillId")
                         .HasColumnType("int");
@@ -285,6 +285,9 @@ namespace Sports_Video_Logbook.Data.Migrations
                     b.Property<string>("AlunoId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ComentarioProfessor")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DataSubmissao")
                         .HasColumnType("datetime2");

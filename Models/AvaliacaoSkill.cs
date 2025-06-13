@@ -15,6 +15,6 @@ namespace Sports_Video_Logbook.Models
         public Skill? Skill { get; set; }
 
         [Range(0, 20)]
-        public int Nota { get; set; }
+        public double Nota { get; set; }
     }
 }

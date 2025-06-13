@@ -58,22 +58,69 @@
         
         <div class="skills-modal-row">
             <div style="flex: 1;">
-                <label style="color: #67432F; font-family: Georgia, serif; font-weight: 500; margin-bottom: 5px; display: block;">Turma</label>
+                <label style="color: #67432F; font-family: Georgia, serif; font-weight: 500; margin-bottom: 5px; display: block;">Atribuída a</label>
                 <div style="padding: 12px 16px; border-radius: 8px; border: 2px solid #b9b9b9; background: #f7f7f7; color: #67432F; font-family: Georgia, serif;">
-                    @Html.DisplayFor(model => model.Turma.Nome)
+                    @if (Model.AlunoId != null)
+                    {
+                        <text>Aluno: @(Model.Aluno?.UserName ?? "N/A")</text>
+                    }
+                    else if (Model.TurmaNome != null)
+                    {
+                        <text>Turma: @Model.TurmaNome</text>
+                    }
+                    else if (Model.UCId != null)
+                    {
+                        <text>Toda a UC: @(Model.UC?.Nome ?? "N/A")</text>
+                    }
+                    else
+                    {
+                        <text>Não especificado</text>
+                    }
                 </div>
             </div>
             <div style="flex: 1;">
                 <label style="color: #67432F; font-family: Georgia, serif; font-weight: 500; margin-bottom: 5px; display: block;">Unidade Curricular</label>
                 <div style="padding: 12px 16px; border-radius: 8px; border: 2px solid #b9b9b9; background: #f7f7f7; color: #67432F; font-family: Georgia, serif;">
-                    @Html.DisplayFor(model => model.UC.Nome)
+                    @if (Model.UC != null)
+                    {
+                        @Html.DisplayFor(model => model.UC.Nome)
+                    }
+                    else if (Model.Turma?.UC != null)
+                    {
+                        @Html.DisplayFor(model => model.Turma.UC.Nome)
+                    }
+                    else
+                    {
+                        <text>N/A</text>
+                    }
                 </div>
             </div>
         </div>
+        
+        @if (Model.TarefaSkills != null && Model.TarefaSkills.Any())
+        {
+            <div class="skills-modal-row">
+                <div style="flex: 1;">
+                    <label style="color: #67432F; font-family: Georgia, serif; font-weight: 500; margin-bottom: 5px; display: block;">Skills Associadas</label>
+                    <div style="padding: 12px 16px; border-radius: 8px; border: 2px solid #b9b9b9; background: #f7f7f7; color: #67432F; font-family: Georgia, serif; min-height: 60px;">
+                        @foreach (var tarefaSkill in Model.TarefaSkills)
+                        {
+                            <div style="margin-bottom: 8px; padding: 6px 10px; background: rgba(103, 67, 47, 0.1); border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-weight: 500;">@(tarefaSkill.Skill?.Nome ?? "N/A")</span>
+                                <span style="background: #67432F; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.85em;">@tarefaSkill.Peso%</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
     </div>
     
     <div class="skills-modal-btns" style="margin-top: 30px;">
-        <a asp-action="Edit" asp-route-id="@Model?.Id" class="skills-modal-submit" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">EDITAR</a>
+        @if (User.IsInRole("Professor"))
+        {
+            <a asp-action="Edit" asp-route-id="@Model?.Id" class="skills-modal-submit" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">EDITAR</a>
+        }
         <a asp-action="Index" class="skills-modal-cancel">VOLTAR À LISTA</a>
     </div>
 </div>

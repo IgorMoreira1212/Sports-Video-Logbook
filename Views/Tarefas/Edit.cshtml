@@ -10,7 +10,6 @@
     <form asp-action="Edit" class="skills-modal-form">
         <div asp-validation-summary="ModelOnly" class="skills-modal-error"></div>
         <input type="hidden" asp-for="Id" />
-        <input type="hidden" asp-for="AlunoId" />
         <input type="hidden" asp-for="TurmaUCId" />
         
         <div class="skills-modal-row">
@@ -46,47 +45,110 @@
         
         <div class="skills-modal-row">
             <div style="flex: 1;">
-                <label style="color: #67432F; font-family: Georgia, serif; font-weight: 500; margin-bottom: 5px; display: block;">
+                <label style="color: #67432F; font-family: Georgia, serif; font-weight: 500; margin-bottom: 5px; display: block;">Estado</label>
+                <div style="display: flex; align-items: center; padding: 12px 16px; border-radius: 8px; border: 2px solid #b9b9b9; background: #fff; color: #67432F; font-family: Georgia, serif;">
                     <input class="form-check-input" asp-for="Concluida" type="checkbox" style="margin-right: 8px;" /> 
-                    Tarefa Concluída
-                </label>
+                    <span>Tarefa Concluída</span>
+                </div>
             </div>
         </div>
         
         <div class="skills-modal-row">
             <div style="flex: 1;">
-                <label asp-for="ProfessorId" class="control-label" style="color: #67432F; font-family: Georgia, serif; font-weight: 500; margin-bottom: 5px; display: block;">Professor</label>
-                <select asp-for="ProfessorId" class="skills-modal-input" asp-items="ViewBag.ProfessorId">
-                    <option value="">Selecione um professor</option>
-                </select>
-                <span asp-validation-for="ProfessorId" class="skills-modal-error"></span>
+                <label style="color: #67432F; font-family: Georgia, serif; font-weight: 500; margin-bottom: 5px; display: block;">Professor</label>
+                <div style="padding: 12px 16px; border-radius: 8px; border: 2px solid #b9b9b9; background: #f7f7f7; color: #67432F; font-family: Georgia, serif;">
+                    @(Model.Professor?.UserName ?? "N/A")
+                </div>
+                <input asp-for="ProfessorId" type="hidden" />
             </div>
             <div style="flex: 1;">
-                <label asp-for="UCId" class="control-label" style="color: #67432F; font-family: Georgia, serif; font-weight: 500; margin-bottom: 5px; display: block;">Unidade Curricular</label>
-                <select asp-for="UCId" class="skills-modal-input" asp-items="ViewBag.UCId">
-                    <option value="">Selecione uma UC</option>
-                </select>
-                <span asp-validation-for="UCId" class="skills-modal-error"></span>
+                <label style="color: #67432F; font-family: Georgia, serif; font-weight: 500; margin-bottom: 5px; display: block;">Unidade Curricular</label>
+                <div style="padding: 12px 16px; border-radius: 8px; border: 2px solid #b9b9b9; background: #f7f7f7; color: #67432F; font-family: Georgia, serif;">
+                    @if (Model.UC != null)
+                    {
+                        @Html.DisplayFor(model => model.UC.Nome)
+                    }
+                    else if (Model.Turma?.UC != null)
+                    {
+                        @Html.DisplayFor(model => model.Turma.UC.Nome)
+                    }
+                    else
+                    {
+                        <text>N/A</text>
+                    }
+                </div>
+                <input asp-for="UCId" type="hidden" />
             </div>
         </div>
         
         <div class="skills-modal-row">
             <div style="flex: 1;">
-                <label asp-for="TurmaNome" class="control-label" style="color: #67432F; font-family: Georgia, serif; font-weight: 500; margin-bottom: 5px; display: block;">Turma</label>
-                <select asp-for="TurmaNome" class="skills-modal-input" asp-items="ViewBag.TurmaNome">
-                    <option value="">Selecione uma turma</option>
-                </select>
-                <span asp-validation-for="TurmaNome" class="skills-modal-error"></span>
+                <label style="color: #67432F; font-family: Georgia, serif; font-weight: 500; margin-bottom: 5px; display: block;">Atribuída a</label>
+                <div style="padding: 12px 16px; border-radius: 8px; border: 2px solid #b9b9b9; background: #f7f7f7; color: #67432F; font-family: Georgia, serif;">
+                    @if (Model.AlunoId != null)
+                    {
+                        <text>Aluno: @(Model.Aluno?.UserName ?? "N/A")</text>
+                    }
+                    else if (Model.TurmaNome != null)
+                    {
+                        <text>Turma: @Model.TurmaNome</text>
+                    }
+                    else if (Model.UCId != null)
+                    {
+                        <text>Toda a UC</text>
+                    }
+                    else
+                    {
+                        <text>Não especificado</text>
+                    }
+                </div>
+                <input asp-for="TurmaNome" type="hidden" />
+                <input asp-for="AlunoId" type="hidden" />
             </div>
-            @if (!string.IsNullOrEmpty(Model.AlunoId))
-            {
-                <div style="flex: 1;">
-                    <label class="control-label" style="color: #67432F; font-family: Georgia, serif; font-weight: 500; margin-bottom: 5px; display: block;">Atribuída ao Aluno</label>
-                    <div style="padding: 12px 16px; border-radius: 8px; border: 2px solid #b9b9b9; background: #f7f7f7; color: #67432F; font-family: Georgia, serif;">
-                        @(Model.Aluno?.UserName ?? "Aluno não encontrado")
+        </div>
+        
+        <div class="skills-modal-row">
+            <div style="flex: 1;">
+                <label style="color: #67432F; font-family: Georgia, serif; font-weight: 500; margin-bottom: 5px; display: block;">Skills Associadas</label>
+                <div id="skills-container" style="padding: 12px 16px; border-radius: 8px; border: 2px solid #b9b9b9; background: #fff; color: #67432F; font-family: Georgia, serif; min-height: 60px;">
+                    @if (Model.TarefaSkills != null && Model.TarefaSkills.Any())
+                    {
+                        var tarefaSkillsList = Model.TarefaSkills.ToList();
+                        @for (int i = 0; i < tarefaSkillsList.Count; i++)
+                        {
+                            var currentSkill = tarefaSkillsList[i];
+                            <div class="skill-item" style="margin-bottom: 12px; padding: 10px; background: rgba(103, 67, 47, 0.05); border-radius: 6px; border: 1px solid rgba(103, 67, 47, 0.2);">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div style="flex: 1;">
+                                        <select name="TarefaSkills[@i].SkillId" class="skills-modal-input" style="margin-bottom: 0;">
+                                            <option value="">Selecione uma skill</option>
+                                            @if (ViewBag.Skills != null)
+                                            {
+                                                @foreach (var skill in (List<Sports_Video_Logbook.Models.Skill>)ViewBag.Skills)
+                                                {
+                                                    <option value="@skill.Id" selected="@(skill.Id == currentSkill.SkillId)">@skill.Nome</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                    <div style="width: 100px;">
+                                        <input name="TarefaSkills[@i].Peso" type="number" min="0" max="100" value="@currentSkill.Peso" class="skills-modal-input" placeholder="Peso %" style="margin-bottom: 0; text-align: center;" />
+                                    </div>
+                                    <button type="button" class="remove-skill-btn" style="background: #b30000; color: white; border: none; border-radius: 4px; padding: 8px 12px; cursor: pointer; font-size: 12px;">REMOVER</button>
+                                </div>
+                                <input name="TarefaSkills[@i].TarefaId" type="hidden" value="@Model.Id" />
+                            </div>
+                        }
+                    }
+                    @{
+                        var displayStyle = Model.TarefaSkills != null && Model.TarefaSkills.Any() ? "display: none;" : "display: block;";
+                    }
+                    <div id="no-skills-message" style="@displayStyle color: #666; font-style: italic; text-align: center; padding: 20px;">
+                        Nenhuma skill associada. Clique em "Adicionar Skill" para começar.
                     </div>
                 </div>
-            }
+                <button type="button" id="add-skill-btn" style="background: #67432F; color: white; border: none; border-radius: 6px; padding: 8px 16px; margin-top: 10px; cursor: pointer; font-family: Georgia, serif; font-weight: 500;">ADICIONAR SKILL</button>
+            </div>
         </div>
         
         <div class="skills-modal-btns">
@@ -121,6 +183,125 @@
             
             // Validar no carregamento da página
             validarDatas();
+            
+            // Gerenciamento de skills
+            let skillIndex = @(Model.TarefaSkills?.Count ?? 0);
+            const skillsContainer = document.getElementById('skills-container');
+            const addSkillBtn = document.getElementById('add-skill-btn');
+            const noSkillsMessage = document.getElementById('no-skills-message');
+            
+            // Adicionar nova skill
+            addSkillBtn.addEventListener('click', function() {
+                const skillItem = document.createElement('div');
+                skillItem.className = 'skill-item';
+                skillItem.style.cssText = 'margin-bottom: 12px; padding: 10px; background: rgba(103, 67, 47, 0.05); border-radius: 6px; border: 1px solid rgba(103, 67, 47, 0.2);';
+                
+                // Criar o HTML da nova skill
+                const skillItemDiv = document.createElement('div');
+                skillItemDiv.style.cssText = 'display: flex; align-items: center; gap: 10px;';
+                
+                // Select da skill
+                const skillSelectDiv = document.createElement('div');
+                skillSelectDiv.style.flex = '1';
+                const skillSelect = document.createElement('select');
+                skillSelect.name = 'TarefaSkills[' + skillIndex + '].SkillId';
+                skillSelect.className = 'skills-modal-input';
+                skillSelect.style.marginBottom = '0';
+                
+                // Adicionar opções
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.textContent = 'Selecione uma skill';
+                skillSelect.appendChild(defaultOption);
+                
+                @if (ViewBag.Skills != null)
+                {
+                    @foreach (var skill in (List<Sports_Video_Logbook.Models.Skill>)ViewBag.Skills)
+                    {
+                        <text>
+                        const option@(skill.Id) = document.createElement('option');
+                        option@(skill.Id).value = '@skill.Id';
+                        option@(skill.Id).textContent = '@skill.Nome';
+                        skillSelect.appendChild(option@(skill.Id));
+                        </text>
+                    }
+                }
+                
+                skillSelectDiv.appendChild(skillSelect);
+                
+                // Input do peso
+                const pesoDiv = document.createElement('div');
+                pesoDiv.style.width = '100px';
+                const pesoInput = document.createElement('input');
+                pesoInput.name = 'TarefaSkills[' + skillIndex + '].Peso';
+                pesoInput.type = 'number';
+                pesoInput.min = '0';
+                pesoInput.max = '100';
+                pesoInput.value = '0';
+                pesoInput.className = 'skills-modal-input';
+                pesoInput.placeholder = 'Peso %';
+                pesoInput.style.cssText = 'margin-bottom: 0; text-align: center;';
+                pesoDiv.appendChild(pesoInput);
+                
+                // Botão remover
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'remove-skill-btn';
+                removeBtn.style.cssText = 'background: #b30000; color: white; border: none; border-radius: 4px; padding: 8px 12px; cursor: pointer; font-size: 12px;';
+                removeBtn.textContent = 'REMOVER';
+                
+                // Hidden input para TarefaId
+                const hiddenInput = document.createElement('input');
+                hiddenInput.name = 'TarefaSkills[' + skillIndex + '].TarefaId';
+                hiddenInput.type = 'hidden';
+                hiddenInput.value = '@Model.Id';
+                
+                // Montar estrutura
+                skillItemDiv.appendChild(skillSelectDiv);
+                skillItemDiv.appendChild(pesoDiv);
+                skillItemDiv.appendChild(removeBtn);
+                skillItem.appendChild(skillItemDiv);
+                skillItem.appendChild(hiddenInput);
+                
+                skillsContainer.insertBefore(skillItem, noSkillsMessage);
+                skillIndex++;
+                updateSkillsVisibility();
+            });
+            
+            // Remover skill
+            skillsContainer.addEventListener('click', function(e) {
+                if (e.target.classList.contains('remove-skill-btn')) {
+                    e.target.closest('.skill-item').remove();
+                    updateSkillsVisibility();
+                    reindexSkills();
+                }
+            });
+            
+            // Atualizar visibilidade da mensagem "nenhuma skill"
+            function updateSkillsVisibility() {
+                const skillItems = skillsContainer.querySelectorAll('.skill-item');
+                if (skillItems.length === 0) {
+                    noSkillsMessage.style.display = 'block';
+                } else {
+                    noSkillsMessage.style.display = 'none';
+                }
+            }
+            
+            // Reindexar skills após remoção
+            function reindexSkills() {
+                const skillItems = skillsContainer.querySelectorAll('.skill-item');
+                skillItems.forEach((item, index) => {
+                    const inputs = item.querySelectorAll('input, select');
+                    inputs.forEach(input => {
+                        const name = input.getAttribute('name');
+                        if (name && name.includes('TarefaSkills[')) {
+                            const newName = name.replace(/TarefaSkills\[\d+\]/, `TarefaSkills[${index}]`);
+                            input.setAttribute('name', newName);
+                        }
+                    });
+                });
+                skillIndex = skillItems.length;
+            }
         });
     </script>
 }

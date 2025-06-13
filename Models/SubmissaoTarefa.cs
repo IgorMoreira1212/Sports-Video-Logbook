@@ -24,6 +24,8 @@ namespace Sports_Video_Logbook.Models
         public ICollection<SubmissaoFicheiro> Ficheiros { get; set; } = new List<SubmissaoFicheiro>();
 
         public double? NotaFinal { get; set; } // Calculada após avaliação
+
+        public string? ComentarioProfessor { get; set; } // Comentário do professor
     }
 
     public class SubmissaoFicheiro

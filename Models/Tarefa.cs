@@ -99,6 +99,9 @@ namespace Sports_Video_Logbook.Models
         [Required]
         public List<int> SkillsSelecionadas { get; set; } = new List<int>();
 
+        // Dicionário para armazenar as percentagens de cada skill (SkillId -> Peso)
+        public Dictionary<int, int> SkillsPesos { get; set; } = new Dictionary<int, int>();
+
         [Required]
         public string Descricao { get; set; } = string.Empty;
 

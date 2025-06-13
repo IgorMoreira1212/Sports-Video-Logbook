@@ -5,11 +5,11 @@
 
 <div class="skills-modal-bg">
     <div class="skills-modal-card">
-        <form asp-action="Create" class="skills-modal-form" method="post">
+        <form asp-action="Create" class="skills-modal-form" method="post" onsubmit="return validateSkillsPercentage()">
             <!-- Primeira linha: Nome (mais largo) -->
             <div class="form-row">
                 <div class="form-col-2">
-                    <input asp-for="Nome" class="skills-modal-input" placeholder="Nome*" autocomplete="off" />
+                    <input asp-for="Nome" class="skills-modal-input" placeholder="Nome*" autocomplete="off" style="margin-bottom: 2px;" />
                     <span asp-validation-for="Nome" class="skills-modal-error"></span>
                 </div>
             </div>
@@ -17,7 +17,7 @@
             <!-- Segunda linha: UC e Atribuir a -->
             <div class="form-row">
                 <div class="form-col">
-                    <select asp-for="UCId" id="uc-select" class="skills-modal-input">
+                    <select asp-for="UCId" id="uc-select" class="skills-modal-input" style="margin-bottom: 2px;">
                         <option value="">Selecione a UC*</option>
                         @foreach (var uc in Model.UCsDisponiveis)
                         {
@@ -27,7 +27,7 @@
                     <span asp-validation-for="UCId" class="skills-modal-error"></span>
                 </div>
                 <div class="form-col">
-                    <select asp-for="AtribuirA" id="atribuir-select" class="skills-modal-input">
+                    <select asp-for="AtribuirA" id="atribuir-select" class="skills-modal-input" style="margin-bottom: 2px;">
                         <option value="">Atribuir a*</option>
                         <option value="Turma">Turma</option>
                         <option value="Aluno">Aluno</option>
@@ -41,7 +41,7 @@
                 <div class="form-col-2">
                     <div class="skills-dropdown-container">
                         <div class="skills-dropdown-header" id="turma-dropdown-header">
-                            <input type="text" class="skills-modal-input" placeholder="Turma*" id="turma-search" autocomplete="off" readonly />
+                            <input type="text" class="skills-modal-input" placeholder="Turma*" id="turma-search" autocomplete="off" readonly style="margin-bottom: 2px;" />
                             <span class="dropdown-arrow">⏷</span>
                         </div>
                         <div class="skills-dropdown-content" id="turma-dropdown">
@@ -69,7 +69,7 @@
                     <div class="form-col-2">
                         <div class="skills-dropdown-container">
                             <div class="skills-dropdown-header" id="alunos-header">
-                                <input type="text" class="skills-modal-input" placeholder="Alunos*" id="alunos-search" autocomplete="off" readonly />
+                                <input type="text" class="skills-modal-input" placeholder="Alunos*" id="alunos-search" autocomplete="off" readonly style="margin-bottom: 2px;" />
                                 <span class="dropdown-arrow">⏷</span>
                             </div>
                             <div class="skills-dropdown-content" id="alunos-dropdown">
@@ -89,26 +89,14 @@
             <!-- Quinta linha: Skills (mais largo) -->
             <div class="form-row">
                 <div class="form-col-2">
-                    <div class="skills-dropdown-container">
-                        <div class="skills-dropdown-header">
-                            <input type="text" class="skills-modal-input" placeholder="Skills*" id="skills-search" autocomplete="off" readonly />
-                            <span class="dropdown-arrow">⏷</span>
-                        </div>
-                        <div class="skills-dropdown-content" id="skills-dropdown">
-                            <div class="skills-search-container">
-                                <input type="text" placeholder="Pesquisar" id="skills-filter" class="skills-search-input" />
-                            </div>
-                            <div class="skills-options" id="skills-options">
-                                @foreach (var skill in Model.SkillsDisponiveis)
-                                {
-                                    <label class="skills-option">
-                                        <input type="checkbox" name="SkillsSelecionadas" value="@skill.Id" />
-                                        <span>@skill.Nome</span>
-                                    </label>
-                                }
-                            </div>
+                    <label style="color: #67432F; font-family: Georgia, serif; font-weight: 500; margin-bottom: 2px; display: block;">Skills e Percentagens*</label>
+                    <div id="skills-container" style="padding: 12px 16px; border-radius: 8px; border: 2px solid #b9b9b9; background: #fff; color: #67432F; font-family: Georgia, serif; min-height: 60px; max-height: 300px; overflow-y: auto;">
+                        <div id="no-skills-message" style="color: #666; font-style: italic; text-align: center; padding: 20px;">
+                            Nenhuma skill selecionada. Clique em "Adicionar Skill" para começar.
                         </div>
                     </div>
+                    <button type="button" id="add-skill-btn" style="background: #67432F; color: white; border: none; border-radius: 6px; padding: 8px 16px; margin-top: 5px; cursor: pointer; font-family: Georgia, serif; font-weight: 500;">ADICIONAR SKILL</button>
+                    <div id="total-percentage" style="margin-top: 5px; font-weight: bold; color: #67432F;">Total: 0%</div>
                     <span asp-validation-for="SkillsSelecionadas" class="skills-modal-error"></span>
                 </div>
             </div>
@@ -116,7 +104,7 @@
             <!-- Sexta linha: Descrição (mais largo) -->
             <div class="form-row">
                 <div class="form-col-2">
-                    <textarea asp-for="Descricao" class="skills-modal-input" placeholder="Descrição*" rows="5" style="resize: vertical; min-height: 120px;"></textarea>
+                    <textarea asp-for="Descricao" class="skills-modal-input" placeholder="Descrição*" rows="3" style="resize: vertical; min-height: 60px; margin-bottom: 2px;"></textarea>
                     <span asp-validation-for="Descricao" class="skills-modal-error"></span>
                 </div>
             </div>
@@ -124,7 +112,7 @@
             <!-- Sétima linha: Data Limite -->
             <div class="form-row">
                 <div class="form-col-2">
-                    <input asp-for="DataFim" class="skills-modal-input" type="datetime-local" placeholder="Data Limite para Submissão*" />
+                    <input asp-for="DataFim" class="skills-modal-input" type="datetime-local" placeholder="Data Limite para Submissão*" style="margin-bottom: 2px;" />
                     <span asp-validation-for="DataFim" class="skills-modal-error"></span>
                     <div style="color: #d32f2f; font-size: 0.85rem; margin-top: 3px; font-family: Georgia, serif;">
                         Se não for inserida uma data, ficará automaticamente definida para 7 dias após a criação da tarefa.
@@ -151,13 +139,40 @@
     width: 90%;
     max-width: 800px;
     padding: 20px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* Estilo personalizado para a scrollbar do modal */
+.skills-modal-card::-webkit-scrollbar {
+    width: 8px;
+}
+
+.skills-modal-card::-webkit-scrollbar-track {
+    background: rgba(103, 67, 47, 0.1);
+    border-radius: 4px;
+}
+
+.skills-modal-card::-webkit-scrollbar-thumb {
+    background: rgba(103, 67, 47, 0.4);
+    border-radius: 4px;
+}
+
+.skills-modal-card::-webkit-scrollbar-thumb:hover {
+    background: rgba(103, 67, 47, 0.6);
+}
+
+/* Para Firefox */
+.skills-modal-card {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(103, 67, 47, 0.4) rgba(103, 67, 47, 0.1);
 }
 
 /* Layout de campos em linha */
 .form-row {
     display: flex;
     gap: 12px;
-    margin-bottom: 8px;
+    margin-bottom: 2px;
 }
 
 .form-col {
@@ -170,7 +185,7 @@
 
 .skills-dropdown-container {
     position: relative;
-    margin-bottom: 6px;
+    margin-bottom: 2px;
 }
 
 .skills-dropdown-header {
@@ -252,6 +267,31 @@ select.skills-modal-input {
     display: block;
 }
 
+/* Estilo personalizado para a scrollbar do container de skills */
+#skills-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+#skills-container::-webkit-scrollbar-track {
+    background: rgba(103, 67, 47, 0.1);
+    border-radius: 4px;
+}
+
+#skills-container::-webkit-scrollbar-thumb {
+    background: rgba(103, 67, 47, 0.4);
+    border-radius: 4px;
+}
+
+#skills-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(103, 67, 47, 0.6);
+}
+
+/* Para Firefox */
+#skills-container {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(103, 67, 47, 0.4) rgba(103, 67, 47, 0.1);
+}
+
 /* Responsividade para o layout em colunas */
 @@media (max-width: 768px) {
     .skills-modal-card {
@@ -274,6 +314,14 @@ select.skills-modal-input {
 </style>
 
 <script>
+// Dados das skills disponíveis
+const skillsDisponiveis = [
+    @foreach (var skill in Model.SkillsDisponiveis)
+    {
+        <text>{ id: @skill.Id, nome: '@Html.Raw(skill.Nome.Replace("'", "\\'"))' },</text>
+    }
+];
+
 document.addEventListener('DOMContentLoaded', function() {
     const ucSelect = document.getElementById('uc-select');
     const atribuirSelect = document.getElementById('atribuir-select');
@@ -285,12 +333,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const alunosFilter = document.getElementById('alunos-filter');
     const alunosOptions = document.getElementById('alunos-options');
     
-    // Skills dropdown functionality
-    const skillsSearch = document.getElementById('skills-search');
-    const skillsDropdown = document.getElementById('skills-dropdown');
-    const skillsFilter = document.getElementById('skills-filter');
-    const skillsOptions = document.getElementById('skills-options');
-    const skillsCheckboxes = document.querySelectorAll('input[name="SkillsSelecionadas"]');
+
     
     // Turma dropdown functionality
     const turmaSearch = document.getElementById('turma-search');
@@ -373,48 +416,144 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Skills dropdown toggle
-    skillsSearch.addEventListener('click', function() {
-        skillsDropdown.classList.toggle('show');
-        turmaDropdown.classList.remove('show'); // Close turma dropdown
+    // Gerenciamento de skills com percentagens
+    let skillIndex = 0;
+    const skillsContainer = document.getElementById('skills-container');
+    const addSkillBtn = document.getElementById('add-skill-btn');
+    const noSkillsMessage = document.getElementById('no-skills-message');
+    const totalPercentageDiv = document.getElementById('total-percentage');
+    
+    // Adicionar nova skill
+    addSkillBtn.addEventListener('click', function() {
+        const skillItem = document.createElement('div');
+        skillItem.className = 'skill-item';
+        skillItem.style.cssText = 'margin-bottom: 12px; padding: 10px; background: rgba(103, 67, 47, 0.05); border-radius: 6px; border: 1px solid rgba(103, 67, 47, 0.2);';
+        
+        // Criar o HTML da nova skill
+        const skillItemDiv = document.createElement('div');
+        skillItemDiv.style.cssText = 'display: flex; align-items: center; gap: 10px;';
+        
+        // Select da skill
+        const skillSelectDiv = document.createElement('div');
+        skillSelectDiv.style.flex = '1';
+        const skillSelect = document.createElement('select');
+        skillSelect.name = 'SkillsSelecionadas';
+        skillSelect.className = 'skills-modal-input';
+        skillSelect.style.marginBottom = '0';
+        skillSelect.required = true;
+        
+        // Adicionar opções
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Selecione uma skill';
+        skillSelect.appendChild(defaultOption);
+        
+        // Adicionar skills disponíveis
+        skillsDisponiveis.forEach(skill => {
+            const option = document.createElement('option');
+            option.value = skill.id;
+            option.textContent = skill.nome;
+            skillSelect.appendChild(option);
+        });
+        
+        skillSelectDiv.appendChild(skillSelect);
+        
+        // Input do peso
+        const pesoDiv = document.createElement('div');
+        pesoDiv.style.width = '100px';
+        const pesoInput = document.createElement('input');
+        pesoInput.name = 'SkillsPesos[' + skillSelect.value + ']';
+        pesoInput.type = 'number';
+        pesoInput.min = '1';
+        pesoInput.max = '100';
+        pesoInput.value = '0';
+        pesoInput.className = 'skills-modal-input';
+        pesoInput.placeholder = 'Peso %';
+        pesoInput.style.cssText = 'margin-bottom: 0; text-align: center;';
+        pesoInput.required = true;
+        pesoDiv.appendChild(pesoInput);
+        
+        // Botão remover
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'remove-skill-btn';
+        removeBtn.style.cssText = 'background: #b30000; color: white; border: none; border-radius: 4px; padding: 8px 12px; cursor: pointer; font-size: 12px;';
+        removeBtn.textContent = 'REMOVER';
+        
+        // Montar estrutura
+        skillItemDiv.appendChild(skillSelectDiv);
+        skillItemDiv.appendChild(pesoDiv);
+        skillItemDiv.appendChild(removeBtn);
+        skillItem.appendChild(skillItemDiv);
+        
+        skillsContainer.insertBefore(skillItem, noSkillsMessage);
+        skillIndex++;
+        updateSkillsVisibility();
+        
+        // Event listeners
+        skillSelect.addEventListener('change', function() {
+            pesoInput.name = 'SkillsPesos[' + this.value + ']';
+            updateTotalPercentage();
+        });
+        
+        pesoInput.addEventListener('input', updateTotalPercentage);
+        
+        removeBtn.addEventListener('click', function() {
+            skillItem.remove();
+            updateSkillsVisibility();
+            updateTotalPercentage();
+        });
     });
+    
+    // Atualizar visibilidade da mensagem "nenhuma skill"
+    function updateSkillsVisibility() {
+        const skillItems = skillsContainer.querySelectorAll('.skill-item');
+        if (skillItems.length === 0) {
+            noSkillsMessage.style.display = 'block';
+        } else {
+            noSkillsMessage.style.display = 'none';
+        }
+    }
+    
+    // Atualizar total de percentagem
+    function updateTotalPercentage() {
+        const pesoInputs = skillsContainer.querySelectorAll('input[type="number"]');
+        let total = 0;
+        
+        pesoInputs.forEach(input => {
+            const value = parseInt(input.value) || 0;
+            total += value;
+        });
+        
+        totalPercentageDiv.textContent = `Total: ${total}%`;
+        totalPercentageDiv.style.color = total === 100 ? '#67432F' : (total > 100 ? '#b30000' : '#d32f2f');
+        
+        // Validação
+        if (total !== 100 && pesoInputs.length > 0) {
+            totalPercentageDiv.textContent += ' (deve somar 100%)';
+        }
+    }
     
     // Turma dropdown toggle
     turmaSearch.addEventListener('click', function() {
         turmaDropdown.classList.toggle('show');
-        skillsDropdown.classList.remove('show'); // Close skills dropdown
         alunosDropdown.classList.remove('show'); // Close alunos dropdown
     });
     
     // Alunos dropdown toggle
     alunosSearch.addEventListener('click', function() {
         alunosDropdown.classList.toggle('show');
-        skillsDropdown.classList.remove('show'); // Close skills dropdown
         turmaDropdown.classList.remove('show'); // Close turma dropdown
     });
     
     // Close dropdown when clicking outside
     document.addEventListener('click', function(e) {
-        if (!e.target.closest('.skills-dropdown-container')) {
-            skillsDropdown.classList.remove('show');
-        }
         if (!e.target.closest('#turma-dropdown-header') && !e.target.closest('#turma-dropdown')) {
             turmaDropdown.classList.remove('show');
         }
         if (!e.target.closest('#alunos-header') && !e.target.closest('#alunos-dropdown')) {
             alunosDropdown.classList.remove('show');
         }
-    });
-    
-    // Skills filter
-    skillsFilter.addEventListener('input', function() {
-        const filterText = this.value.toLowerCase();
-        const options = skillsOptions.querySelectorAll('.skills-option');
-        
-        options.forEach(option => {
-            const text = option.textContent.toLowerCase();
-            option.style.display = text.includes(filterText) ? 'flex' : 'none';
-        });
     });
     
     // Turma filter
@@ -439,21 +578,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Update skills display
-    function updateSkillsDisplay() {
-        const selected = Array.from(skillsCheckboxes)
-            .filter(cb => cb.checked)
-            .map(cb => cb.nextElementSibling.textContent);
-        
-        if (selected.length > 0) {
-            skillsSearch.value = selected.join(', ');
-            skillsSearch.style.color = '#333';
-        } else {
-            skillsSearch.value = '';
-            skillsSearch.placeholder = 'Skills*';
-            skillsSearch.style.color = '#999';
-        }
-    }
+
     
     // Update turma display
     function updateTurmaDisplay() {
@@ -585,10 +710,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updateAlunosDisplay();
     }
     
-    // Skills checkbox change handler
-    skillsCheckboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', updateSkillsDisplay);
-    });
+
     
     // Turma checkbox change handler
     turmaCheckboxes.forEach(checkbox => {
@@ -606,10 +728,57 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Initialize
-    updateSkillsDisplay();
     updateTurmaDisplay();
     updateAlunosDisplay();
+    updateSkillsVisibility();
 });
+
+// Função de validação para o formulário
+function validateSkillsPercentage() {
+    const skillItems = document.querySelectorAll('.skill-item');
+    
+    if (skillItems.length === 0) {
+        alert('Deve adicionar pelo menos uma skill à tarefa.');
+        return false;
+    }
+    
+    let total = 0;
+    let hasEmptySkill = false;
+    let hasEmptyWeight = false;
+    
+    skillItems.forEach(item => {
+        const skillSelect = item.querySelector('select[name="SkillsSelecionadas"]');
+        const pesoInput = item.querySelector('input[type="number"]');
+        
+        if (!skillSelect.value) {
+            hasEmptySkill = true;
+        }
+        
+        const peso = parseInt(pesoInput.value) || 0;
+        if (peso <= 0) {
+            hasEmptyWeight = true;
+        }
+        
+        total += peso;
+    });
+    
+    if (hasEmptySkill) {
+        alert('Todas as skills devem ser selecionadas.');
+        return false;
+    }
+    
+    if (hasEmptyWeight) {
+        alert('Todas as skills devem ter um peso maior que 0.');
+        return false;
+    }
+    
+    if (total !== 100) {
+        alert(`A soma das percentagens deve ser exatamente 100%. Atual: ${total}%`);
+        return false;
+    }
+    
+    return true;
+}
 </script>
 
 @section Scripts {
