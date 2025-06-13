@@ -239,49 +239,49 @@
         
         <div class="mt-3" style="padding: 15px 0; border-top: 1px solid #ddd;">
             <small class="text-muted">
-                <i class="bi bi-info-circle"></i> 
+                <i class="bi bi-info-circle"></i>
                 @if (User.IsInRole("Aluno"))
                 {
-                    @{
-                        int totalConcluidas = Model.Count();
-                        int avaliadas = Model.Count(t => t.Submissoes != null && t.Submissoes.Any() && t.Submissoes.First().NotaFinal.HasValue);
-                        int aguardandoAvaliacao = totalConcluidas - avaliadas;
-                        double? mediaNotas = null;
-                        
-                        if (avaliadas > 0)
-                        {
-                            var notasValidas = Model.Where(t => t.Submissoes != null && t.Submissoes.Any() && t.Submissoes.First().NotaFinal.HasValue)
-                                                   .Select(t => t.Submissoes.First().NotaFinal.Value);
-                            mediaNotas = notasValidas.Average();
-                        }
+                    int totalConcluidas = Model.Count();
+                    int avaliadas = Model.Count(t => t.Submissoes != null && t.Submissoes.Any() && t.Submissoes.First().NotaFinal.HasValue);
+                    int aguardandoAvaliacao = totalConcluidas - avaliadas;
+                    double? mediaNotas = null;
+
+                    if (avaliadas > 0)
+                    {
+                        var notasValidas = Model.Where(t => t.Submissoes != null && t.Submissoes.Any() && t.Submissoes.First().NotaFinal.HasValue)
+                        .Select(t => t.Submissoes.First().NotaFinal.Value);
+                        mediaNotas = notasValidas.Average();
                     }
-                    @:Total de tarefas concluídas: @totalConcluidas | 
-                    @:<span style="color: #28a745;">Avaliadas: @avaliadas</span> | 
+
+                    @:Total de tarefas concluídas: @totalConcluidas |
+                    @:<span style="color: #28a745;">Avaliadas: @avaliadas</span> |
                     @:<span style="color: #17a2b8;">Aguardando avaliação: @aguardandoAvaliacao</span>
-                    @if (mediaNotas.HasValue)
+
+                    if (mediaNotas.HasValue)
                     {
                         string corMedia = mediaNotas >= 14 ? "#28a745" : (mediaNotas >= 9.5 ? "#ffc107" : "#dc3545");
-                        <br>
+                        <br />
                         @:Média das notas: <span style="color: @corMedia; font-weight: bold;">@mediaNotas.Value.ToString("F1")/20</span>
                     }
                 }
                 else
                 {
-                    @{
-                        int totalTarefas = Model.Count();
-                        int avaliadas = Model.Count(t => t.Submissoes != null && t.Submissoes.Any() && t.Submissoes.First().NotaFinal.HasValue);
-                        int porAvaliar = Model.Count(t => t.Submissoes != null && t.Submissoes.Any() && !t.Submissoes.First().NotaFinal.HasValue);
-                        int semSubmissoes = Model.Count(t => t.Submissoes == null || !t.Submissoes.Any());
-                    }
-                    @:Total de tarefas: @totalTarefas | 
-                    @:Concluídas: @(Model.Count(t => t.Concluida)) | 
-                    @:Pendentes: @(Model.Count(t => !t.Concluida && t.DataFim >= DateTime.Now)) | 
+                    int totalTarefas = Model.Count();
+                    int avaliadas = Model.Count(t => t.Submissoes != null && t.Submissoes.Any() && t.Submissoes.First().NotaFinal.HasValue);
+                    int porAvaliar = Model.Count(t => t.Submissoes != null && t.Submissoes.Any() && !t.Submissoes.First().NotaFinal.HasValue);
+                    int semSubmissoes = Model.Count(t => t.Submissoes == null || !t.Submissoes.Any());
+
+                    @:Total de tarefas: @totalTarefas |
+                    @:Concluídas: @(Model.Count(t => t.Concluida)) |
+                    @:Pendentes: @(Model.Count(t => !t.Concluida && t.DataFim >= DateTime.Now)) |
                     @:Expiradas: @(Model.Count(t => !t.Concluida && t.DataFim < DateTime.Now))
-                    <br>
-                    @:Avaliação: <span style="color: #28a745;">Avaliadas: @avaliadas</span> | 
-                    @:<span style="color: #ffc107;">Por Avaliar: @porAvaliar</span> | 
+                    <br />
+                    @:Avaliação: <span style="color: #28a745;">Avaliadas: @avaliadas</span> |
+                    @:<span style="color: #ffc107;">Por Avaliar: @porAvaliar</span> |
                     @:<span style="color: #6c757d;">Sem Submissões: @semSubmissoes</span>
                 }
+
             </small>
         </div>
     }

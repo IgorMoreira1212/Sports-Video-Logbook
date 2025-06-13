@@ -7,29 +7,85 @@
 <div class="skills-card" data-page="skills">
     <div class="skills-header" style="display: flex; align-items: center; gap: 16px;">
         <input id="searchSkill" type="text" class="skills-search" placeholder="Pesquisar" style="flex: 1;" />
-        <a asp-action="Create" class="skills-add-btn" style="width: 220px; min-width: 220px; max-width: 220px; text-align: center; margin-left: auto;">ADICIONAR SKILL</a>
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-action="Create" class="skills-add-btn" style="width: 220px; min-width: 220px; max-width: 220px; text-align: center; margin-left: auto;">ADICIONAR SKILL</a>
+        }
     </div>
     <table class="skills-table" style="width: 100%; table-layout: fixed;">
         <thead>
             <tr>
-                <th class="skills-th" style="width: 70%;">Skill</th>
-                <th class="skills-th skills-th-action" style="width: 30%; text-align: center;">Ação</th>
+                @if (User.IsInRole("Admin"))
+                {
+                    <th class="skills-th" style="width: 70%;">Skill</th>
+                    <th class="skills-th skills-th-action" style="width: 30%; text-align: center;">Ação</th>
+                }
+                else
+                {
+                    <th class="skills-th" style="width: 60%;">Skill Dominada</th>
+                    <th class="skills-th" style="width: 25%; text-align: center;">Melhor Nota</th>
+                    <th class="skills-th" style="width: 15%; text-align: center;">Avaliações</th>
+                }
             </tr>
         </thead>
         <tbody id="skillsList">
         @foreach (var item in Model) {
             <tr class="skill-row">
-                <td class="skills-td skill-name" style="width: 70%; white-space: normal; word-break: break-word; padding-right: 20px;">@item.Nome</td>
-                <td class="skills-td skills-td-action" style="width: 30%; text-align: center;">
-                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" style="display:inline;">
-                        <input type="hidden" name="Id" value="@item.Id" />
-                        <button type="submit" class="skills-remove-btn" onclick="return confirm('Tem certeza que deseja remover esta skill?')">REMOVER</button>
-                    </form>
-                </td>
+                @if (User.IsInRole("Admin"))
+                {
+                    <td class="skills-td skill-name" style="width: 70%; white-space: normal; word-break: break-word; padding-right: 20px;">@item.Nome</td>
+                    <td class="skills-td skills-td-action" style="width: 30%; text-align: center;">
+                        <form asp-action="Delete" asp-route-id="@item.Id" method="post" style="display:inline;">
+                            <input type="hidden" name="Id" value="@item.Id" />
+                            <button type="submit" class="skills-remove-btn" onclick="return confirm('Tem certeza que deseja remover esta skill?')">REMOVER</button>
+                        </form>
+                    </td>
+                }
+                    else
+                    {
+                        // Buscar avaliações desta skill para o aluno atual
+                        var avaliacoesSkill = ViewBag.AvaliacoesSkill as Dictionary<int, List<double>>;
+                        var notasSkill = avaliacoesSkill?.ContainsKey(item.Id) == true ? avaliacoesSkill[item.Id] : new List<double>();
+                        var melhorNota = notasSkill.Any() ? notasSkill.Max() : 0.0;
+                        var totalAvaliacoes = notasSkill.Count;
+
+                        string corNota = melhorNota >= 14 ? "#28a745" : (melhorNota >= 9.5 ? "#ffc107" : "#dc3545");
+
+                        <td class="skills-td skill-name" style="width: 60%; white-space: normal; word-break: break-word; padding-right: 20px;">
+                            <strong>@item.Nome</strong>
+                            <br><small class="text-success"><i class="bi bi-check-circle-fill"></i> Skill dominada</small>
+                        </td>
+                        <td class="skills-td" style="width: 25%; text-align: center;">
+                            <span style="color: @corNota; font-weight: bold; font-size: 16px;">
+                                @melhorNota.ToString("F1")/20
+                            </span>
+                        </td>
+                        <td class="skills-td" style="width: 15%; text-align: center;">
+                            <span class="badge bg-info">@totalAvaliacoes</span>
+                        </td>
+                    }
+
             </tr>
         }
         </tbody>
     </table>
+    
+    @if (User.IsInRole("Aluno"))
+    {
+        <div class="mt-3" style="padding: 15px 0; border-top: 1px solid #ddd;">
+            <small class="text-muted">
+                <i class="bi bi-info-circle"></i> 
+                Aqui estão listadas apenas as skills onde obtiveste uma avaliação igual ou superior a 9.5 valores.
+                @{
+                    var totalSkills = Model.Count();
+                    var avaliacoesSkill = ViewBag.AvaliacoesSkill as Dictionary<int, List<double>>;
+                    var totalAvaliacoes = avaliacoesSkill?.Values.Sum(v => v.Count) ?? 0;
+                }
+                <br>
+                Total de skills dominadas: @totalSkills | Total de avaliações: @totalAvaliacoes
+            </small>
+        </div>
+    }
 </div>
 
 @section Scripts {
