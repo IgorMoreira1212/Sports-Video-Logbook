@@ -1,7 +1,7 @@
-﻿@model IEnumerable<Sports_Video_Logbook.Models.Tarefa>
+@model IEnumerable<Sports_Video_Logbook.Models.Tarefa>
 
 @{
-    ViewData["Title"] = User.IsInRole("Aluno") ? "LogBook" : "Lista de Tarefas";
+    ViewData["Title"] = "LogBook";
 }
 
 <div class="skills-card">
@@ -34,71 +34,48 @@
         </div>
     }
     
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin: 15px 0;">
-            @TempData["Error"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    }
-    
     @if (!Model.Any())
     {
         <div class="alert alert-info text-center" style="margin: 20px 0;">
-            <i class="bi bi-info-circle"></i> 
-            @if (User.IsInRole("Aluno"))
-            {
-                @:Nenhuma tarefa encontrada no seu histórico.
-            }
-            else
-            {
-                @:Nenhuma tarefa encontrada. Crie a primeira tarefa para começar.
-            }
+            <i class="bi bi-info-circle"></i> Nenhuma tarefa encontrada.
         </div>
     }
     else
     {
-        <table class="skills-table">
+        <table class="skills-table" style="width: 100%; table-layout: fixed;">
             <thead>
                 <tr>
-                    <th class="skills-th">Tarefa</th>
                     @if (User.IsInRole("Professor"))
                     {
-                        <th class="skills-th">Aluno</th>
+                        <th class="skills-th" style="width: 30%;">Tarefa</th>
+                        <th class="skills-th" style="width: 12%;">Aluno</th>
+                        <th class="skills-th" style="width: 18%;">Unidade Curricular</th>
+                        <th class="skills-th" style="width: 12%;">Data Limite</th>
+                        <th class="skills-th" style="width: 13%;">Estado Avaliação</th>
+                        <th class="skills-th skills-th-action" style="width: 15%;">Ações</th>
                     }
-                    <th class="skills-th">Unidade Curricular</th>
-                    <th class="skills-th">Data Limite</th>
-                    <th class="skills-th skills-th-action">@(User.IsInRole("Professor") ? "Ações" : "Ação")</th>
+                    else
+                    {
+                        <th class="skills-th" style="width: 40%;">Tarefa</th>
+                        <th class="skills-th" style="width: 25%;">Unidade Curricular</th>
+                        <th class="skills-th" style="width: 20%;">Data Limite</th>
+                        <th class="skills-th skills-th-action" style="width: 15%;">Ação</th>
+                    }
                 </tr>
             </thead>
             <tbody>
             @foreach (var item in Model) 
             {
                 <tr class="skill-row">
-                    <td class="skills-td">
-                        <strong>@item.Titulo</strong>
-                        @if (!string.IsNullOrEmpty(item.Descricao))
-                        {
-                            <br><small class="text-muted">@item.Descricao</small>
-                        }
-                        <br>
-                        @if (User.IsInRole("Aluno"))
-                        {
-                            @if (item.Concluida)
+                    @if (User.IsInRole("Professor"))
+                    {
+                        <td class="skills-td" style="width: 30%; padding-right: 10px;">
+                            <strong>@item.Titulo</strong>
+                            @if (!string.IsNullOrEmpty(item.Descricao))
                             {
-                                <span class="badge bg-success">
-                                    <i class="bi bi-check-circle"></i> Concluída
-                                </span>
+                                <br><small class="text-muted">@item.Descricao</small>
                             }
-                            else
-                            {
-                                <span class="badge" style="background-color: #b30000; color: white;">
-                                    <i class="bi bi-exclamation-triangle"></i> Expirada
-                                </span>
-                            }
-                        }
-                        else
-                        {
+                            <br>
                             @if (item.Concluida)
                             {
                                 <span class="badge bg-success">
@@ -117,46 +94,144 @@
                                     <i class="bi bi-clock"></i> Pendente
                                 </span>
                             }
-                        }
-                    </td>
-                    @if (User.IsInRole("Professor"))
-                    {
-                        <td class="skills-td">@(item.Aluno?.UserName ?? "N/A")</td>
+                        </td>
+                        <td class="skills-td" style="width: 12%;">@(item.Aluno?.UserName ?? "N/A")</td>
+                        <td class="skills-td" style="width: 18%;">@(item.UC?.Nome ?? "N/A")</td>
+                        <td class="skills-td" style="width: 12%;">
+                            @item.DataFim.ToString("dd/MM/yyyy")
+                            <br><small class="text-muted">@item.DataFim.ToString("HH:mm")</small>
+                        </td>
+                        <td class="skills-td" style="width: 13%;">
+                            @{
+                                var submissao = item.Submissoes?.FirstOrDefault();
+                                
+                                string estadoTexto = "";
+                                string estadoCor = "";
+                                string estadoIcone = "";
+                                
+                                if (submissao == null)
+                                {
+                                    estadoTexto = "Sem Submissão";
+                                    estadoCor = "#6c757d";
+                                    estadoIcone = "bi-dash-circle";
+                                }
+                                else if (submissao.NotaFinal.HasValue)
+                                {
+                                    estadoTexto = "Avaliada";
+                                    estadoCor = "#28a745";
+                                    estadoIcone = "bi-check-circle-fill";
+                                }
+                                else
+                                {
+                                    estadoTexto = "Por Avaliar";
+                                    estadoCor = "#ffc107";
+                                    estadoIcone = "bi-clock-fill";
+                                }
+                            }
+                            <span class="badge" style="background-color: @estadoCor; color: white; font-size: 11px; padding: 6px 8px;">
+                                <i class="@estadoIcone" style="margin-right: 4px;"></i>@estadoTexto
+                            </span>
+                        </td>
+                        <td class="skills-td skills-td-action" style="width: 15%;">
+                            <div style="display: flex; flex-direction: row; gap: 8px; justify-content: center; flex-wrap: wrap;">
+                                <a asp-action="Details" asp-route-id="@item.Id" style="background-color: #67432F; color: white; padding: 10px 16px; text-decoration: none; border-radius: 6px; text-align: center; font-size: 12px; font-weight: bold; width: 140px; transition: background 0.2s;" onmouseover="this.style.backgroundColor='#4a2f21'" onmouseout="this.style.backgroundColor='#67432F'">DETALHES</a>
+                                <a asp-action="VerSubmissoes" asp-route-id="@item.Id" style="background-color: #67432F; color: white; padding: 10px 16px; text-decoration: none; border-radius: 6px; text-align: center; font-size: 12px; font-weight: bold; width: 140px; transition: background 0.2s;" onmouseover="this.style.backgroundColor='#4a2f21'" onmouseout="this.style.backgroundColor='#67432F'">VER SUBMISSÕES</a>
+                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" style="margin: 0; width: 140px;">
+                                    <button type="submit" onclick="return confirm('Tem certeza que deseja remover esta tarefa?')" style="background-color: #b30000; color: white; padding: 10px 16px; border: none; border-radius: 6px; width: 100%; font-size: 12px; font-weight: bold; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.backgroundColor='#7a0000'" onmouseout="this.style.backgroundColor='#b30000'">REMOVER</button>
+                                </form>
+                            </div>
+                        </td>
                     }
-                    <td class="skills-td">@(item.UC?.Nome ?? "N/A")</td>
-                    <td class="skills-td">
-                        @item.DataFim.ToString("dd/MM/yyyy")
-                        <br><small class="text-muted">@item.DataFim.ToString("HH:mm")</small>
-                        @if (User.IsInRole("Aluno"))
-                        {
+                    else
+                    {
+                        <td class="skills-td" style="width: 40%; padding-right: 10px;">
+                            <strong>@item.Titulo</strong>
+                            @if (!string.IsNullOrEmpty(item.Descricao))
+                            {
+                                <br><small class="text-muted">@item.Descricao</small>
+                            }
+                            <br>
                             @if (item.Concluida)
                             {
-                                <br><small class="text-success">
-                                    <i class="bi bi-check-circle"></i> Concluída em tempo
-                                </small>
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle"></i> Concluída
+                                </span>
+                            }
+                            else if (item.DataFim < DateTime.Now)
+                            {
+                                <span class="badge" style="background-color: #b30000; color: white;">
+                                    <i class="bi bi-exclamation-triangle"></i> Expirada
+                                </span>
                             }
                             else
                             {
-                                <br><small class="text-danger">
-                                    <i class="bi bi-exclamation-triangle"></i> Não concluída
-                                </small>
+                                <span class="badge bg-warning text-dark">
+                                    <i class="bi bi-clock"></i> Pendente
+                                </span>
                             }
-                        }
-                    </td>
-                    <td class="skills-td skills-td-action">
-                        @if (User.IsInRole("Professor"))
-                        {
-                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                                <a asp-action="Details" asp-route-id="@item.Id" class="skills-details-btn">DETALHES</a>
-                                <a asp-action="VerSubmissoes" asp-route-id="@item.Id" class="skills-details-btn" style="background-color: #67432F; color: white; margin-left: 8px;">VER SUBMISSÕES</a>
-                                <button type="button" class="skills-details-btn" style="background-color: #b30000; color: white; border: none; cursor: pointer;" onclick="confirmarRemocao(@item.Id, '@item.Titulo')">REMOVER</button>
+                        </td>
+                        <td class="skills-td" style="width: 25%;">@(item.UC?.Nome ?? "N/A")</td>
+                        <td class="skills-td" style="width: 20%;">
+                            @item.DataFim.ToString("dd/MM/yyyy")
+                            <br><small class="text-muted">@item.DataFim.ToString("HH:mm")</small>
+                                @if (item.Concluida)
+                                {
+                                    var submissao = item.Submissoes?.FirstOrDefault();
+                                    bool foiComAtraso = submissao != null && submissao.DataSubmissao > item.DataFim;
+
+                                    if (foiComAtraso)
+                                    {
+                                        <br>
+
+                                        <small class="text-warning">
+                                            <i class="bi bi-exclamation-circle"></i> Concluída com atraso
+                                        </small>
+                                    }
+                                    else
+                                    {
+                                        <br>
+
+                                        <small class="text-success">
+                                            <i class="bi bi-check-circle"></i> Concluída no prazo
+                                        </small>
+                                    }
+                                    
+                                    @* Mostrar estado de avaliação e nota *@
+                                    if (submissao != null)
+                                    {
+                                        <br>
+                                        if (submissao.NotaFinal.HasValue)
+                                        {
+                                            var nota = submissao.NotaFinal.Value;
+                                            string corNota = nota >= 14 ? "#28a745" : (nota >= 9.5 ? "#ffc107" : "#dc3545");
+                                            <small style="color: @corNota; font-weight: bold;">
+                                                <i class="bi bi-star-fill"></i> Nota: @nota.ToString("F1")/20
+                                            </small>
+                                        }
+                                        else
+                                        {
+                                            <small class="text-info">
+                                                <i class="bi bi-clock"></i> Aguardando avaliação
+                                            </small>
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    <br>
+
+                                    <small class="text-danger">
+                                        <i class="bi bi-exclamation-triangle"></i> Não concluída
+                                    </small>
+                                }
+
+                        </td>
+                        <td class="skills-td skills-td-action" style="width: 15%;">
+                            <div style="display: flex; flex-direction: row; gap: 8px; justify-content: center; flex-wrap: wrap;">
+                                <a asp-action="Details" asp-route-id="@item.Id" style="background-color: #67432F; color: white; padding: 10px 16px; text-decoration: none; border-radius: 6px; text-align: center; font-size: 12px; font-weight: bold; width: 140px; transition: background 0.2s;" onmouseover="this.style.backgroundColor='#4a2f21'" onmouseout="this.style.backgroundColor='#67432F'">DETALHES</a>
                             </div>
-                        }
-                        else
-                        {
-                            <a asp-action="Details" asp-route-id="@item.Id" class="skills-details-btn">DETALHES</a>
-                        }
-                    </td>
+                        </td>
+                    }
                 </tr>
             }
             </tbody>
@@ -165,12 +240,47 @@
         <div class="mt-3" style="padding: 15px 0; border-top: 1px solid #ddd;">
             <small class="text-muted">
                 <i class="bi bi-info-circle"></i> 
-                @if (!User.IsInRole("Aluno"))
+                @if (User.IsInRole("Aluno"))
                 {
-                    @:Total de tarefas: @Model.Count() | 
+                    @{
+                        int totalConcluidas = Model.Count();
+                        int avaliadas = Model.Count(t => t.Submissoes != null && t.Submissoes.Any() && t.Submissoes.First().NotaFinal.HasValue);
+                        int aguardandoAvaliacao = totalConcluidas - avaliadas;
+                        double? mediaNotas = null;
+                        
+                        if (avaliadas > 0)
+                        {
+                            var notasValidas = Model.Where(t => t.Submissoes != null && t.Submissoes.Any() && t.Submissoes.First().NotaFinal.HasValue)
+                                                   .Select(t => t.Submissoes.First().NotaFinal.Value);
+                            mediaNotas = notasValidas.Average();
+                        }
+                    }
+                    @:Total de tarefas concluídas: @totalConcluidas | 
+                    @:<span style="color: #28a745;">Avaliadas: @avaliadas</span> | 
+                    @:<span style="color: #17a2b8;">Aguardando avaliação: @aguardandoAvaliacao</span>
+                    @if (mediaNotas.HasValue)
+                    {
+                        string corMedia = mediaNotas >= 14 ? "#28a745" : (mediaNotas >= 9.5 ? "#ffc107" : "#dc3545");
+                        <br>
+                        @:Média das notas: <span style="color: @corMedia; font-weight: bold;">@mediaNotas.Value.ToString("F1")/20</span>
+                    }
+                }
+                else
+                {
+                    @{
+                        int totalTarefas = Model.Count();
+                        int avaliadas = Model.Count(t => t.Submissoes != null && t.Submissoes.Any() && t.Submissoes.First().NotaFinal.HasValue);
+                        int porAvaliar = Model.Count(t => t.Submissoes != null && t.Submissoes.Any() && !t.Submissoes.First().NotaFinal.HasValue);
+                        int semSubmissoes = Model.Count(t => t.Submissoes == null || !t.Submissoes.Any());
+                    }
+                    @:Total de tarefas: @totalTarefas | 
                     @:Concluídas: @(Model.Count(t => t.Concluida)) | 
                     @:Pendentes: @(Model.Count(t => !t.Concluida && t.DataFim >= DateTime.Now)) | 
                     @:Expiradas: @(Model.Count(t => !t.Concluida && t.DataFim < DateTime.Now))
+                    <br>
+                    @:Avaliação: <span style="color: #28a745;">Avaliadas: @avaliadas</span> | 
+                    @:<span style="color: #ffc107;">Por Avaliar: @porAvaliar</span> | 
+                    @:<span style="color: #6c757d;">Sem Submissões: @semSubmissoes</span>
                 }
             </small>
         </div>
@@ -210,22 +320,13 @@
         });
     }
     
-    // Função para confirmar remoção de tarefa
-    function confirmarRemocao(tarefaId, tarefaTitulo) {
-        if (confirm(`Tem a certeza de que deseja remover a tarefa "${tarefaTitulo}"?\n\nEsta ação não pode ser desfeita.`)) {
-            const deleteForm = document.getElementById('deleteForm');
-            deleteForm.action = '/Tarefas/Delete/' + tarefaId;
-            deleteForm.submit();
-        }
-    }
-    
-    // Auto-dismiss alerts after 5 seconds
+    // Auto-dismiss success alerts after 5 seconds
     setTimeout(function() {
-        var alerts = document.querySelectorAll('.alert-success, .alert-danger');
+        var alerts = document.querySelectorAll('.alert-success');
         alerts.forEach(function(alert) {
             var bsAlert = new bootstrap.Alert(alert);
             bsAlert.close();
         });
     }, 5000);
 </script>
-}
+} 

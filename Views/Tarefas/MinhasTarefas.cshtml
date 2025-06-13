@@ -42,53 +42,89 @@
     }
     else
     {
-        <table class="skills-table">
+        <table class="skills-table" style="width: 100%; table-layout: fixed;">
             <thead>
                 <tr>
-                    <th class="skills-th">Tarefa</th>
-                    <th class="skills-th">Unidade Curricular</th>
-                    <th class="skills-th">Data Limite</th>
-                    <th class="skills-th skills-th-action">Ação</th>
+                    <th class="skills-th" style="width: 40%;">Tarefa</th>
+                    <th class="skills-th" style="width: 25%;">Unidade Curricular</th>
+                    <th class="skills-th" style="width: 20%;">Data Limite</th>
+                    <th class="skills-th skills-th-action" style="width: 15%;">Ação</th>
                 </tr>
             </thead>
             <tbody>
             @foreach (var item in Model) 
             {
                 <tr class="skill-row">
-                    <td class="skills-td">
+                    <td class="skills-td" style="width: 40%; padding-right: 10px;">
                         <strong>@item.Titulo</strong>
                         @if (!string.IsNullOrEmpty(item.Descricao))
                         {
                             <br><small class="text-muted">@item.Descricao</small>
                         }
                         <br>
-                        <span class="badge bg-warning text-dark">
-                            <i class="bi bi-clock"></i> Pendente
-                        </span>
+                        @if (item.Concluida)
+                        {
+                            <span class="badge bg-success">
+                                <i class="bi bi-check-circle"></i> Concluída
+                            </span>
+                        }
+                        else if (item.DataFim < DateTime.Now)
+                        {
+                            <span class="badge" style="background-color: #b30000; color: white;">
+                                <i class="bi bi-exclamation-triangle"></i> Expirada
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning text-dark">
+                                <i class="bi bi-clock"></i> Pendente
+                            </span>
+                        }
                     </td>
-                    <td class="skills-td">@(item.UC?.Nome ?? "N/A")</td>
-                    <td class="skills-td">
+                    <td class="skills-td" style="width: 25%;">@(item.UC?.Nome ?? "N/A")</td>
+                    <td class="skills-td" style="width: 20%;">
                         @item.DataFim.ToString("dd/MM/yyyy")
                         <br><small class="text-muted">@item.DataFim.ToString("HH:mm")</small>
-                        @if (item.DataFim.Date == DateTime.Today)
-                        {
-                            <br><small class="text-warning">
-                                <i class="bi bi-clock"></i> Vence hoje
-                            </small>
-                        }
+                            @if (item.Concluida)
+                            {
+                                var submissao = item.Submissoes?.FirstOrDefault();
+                                bool foiComAtraso = submissao != null && submissao.DataSubmissao > item.DataFim;
+
+                                if (foiComAtraso)
+                                {
+                                    <br>
+
+                                    <small class="text-warning">
+                                        <i class="bi bi-exclamation-circle"></i> Concluída com atraso
+                                    </small>
+                                }
+                                else
+                                {
+                                    <br>
+
+                                    <small class="text-success">
+                                        <i class="bi bi-check-circle"></i> Concluída no prazo
+                                    </small>
+                                }
+                            }
+                            else
+                            {
+                                <br>
+
+                                <small class="text-danger">
+                                    <i class="bi bi-exclamation-triangle"></i> Não concluída
+                                </small>
+                            }
+
                     </td>
-                    <td class="skills-td skills-td-action">
-                        <a asp-action="Details" asp-route-id="@item.Id" class="skills-details-btn">DETALHES</a>
-                        @if (!item.Concluida)
-                        {
-                            <a asp-action="Submeter" asp-route-id="@item.Id" class="skills-details-btn" style="background-color: #67432F; color: white; margin-left: 8px;">SUBMETER</a>
-                        }
-                        
-                        <form asp-action="CompletarTarefa" asp-route-id="@item.Id" method="post" style="display:inline;">
-                            <button type="submit" class="skills-details-btn" onclick="return confirm('Tem certeza que deseja marcar esta tarefa como concluída?')" style="background-color: #1e7e34; border-color: #1e7e34; padding: 8px 20px; min-width: 120px; text-align: center; vertical-align: middle; display: inline-block;">
-                                COMPLETAR
-                            </button>
-                        </form>
+                    <td class="skills-td skills-td-action" style="width: 15%;">
+                        <div style="display: flex; flex-direction: row; gap: 8px; justify-content: center; flex-wrap: wrap;">
+                            <a asp-action="Details" asp-route-id="@item.Id" style="background-color: #67432F; color: white; padding: 10px 16px; text-decoration: none; border-radius: 6px; text-align: center; font-size: 12px; font-weight: bold; width: 140px; transition: background 0.2s;" onmouseover="this.style.backgroundColor='#4a2f21'" onmouseout="this.style.backgroundColor='#67432F'">DETALHES</a>
+                            @if (!item.Concluida)
+                            {
+                                <a asp-action="Submeter" asp-route-id="@item.Id" style="background-color: #1e7e34; color: white; padding: 10px 16px; text-decoration: none; border-radius: 6px; text-align: center; font-size: 12px; font-weight: bold; width: 140px; transition: background 0.2s;" onmouseover="this.style.backgroundColor='#155724'" onmouseout="this.style.backgroundColor='#1e7e34'">SUBMETER</a>
+                            }
+                        </div>
                     </td>
                 </tr>
             }
@@ -98,11 +134,9 @@
         <div class="mt-3" style="padding: 15px 0; border-top: 1px solid #ddd;">
             <small class="text-muted">
                 <i class="bi bi-info-circle"></i> 
-                Total de tarefas pendentes: @Model.Count()
-                @if (Model.Any(t => t.DataFim.Date == DateTime.Today))
-                {
-                    <span class="text-warning"> | @(Model.Count(t => t.DataFim.Date == DateTime.Today)) vencem hoje</span>
-                }
+                Total de tarefas: @Model.Count() | 
+                Pendentes: @(Model.Count(t => !t.Concluida && t.DataFim >= DateTime.Now)) | 
+                Expiradas: @(Model.Count(t => !t.Concluida && t.DataFim < DateTime.Now))
             </small>
         </div>
     }

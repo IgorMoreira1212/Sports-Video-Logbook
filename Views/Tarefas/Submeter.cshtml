@@ -2,24 +2,64 @@
 @{
     ViewData["Title"] = "Submeter Tarefa";
 }
-<div class="skills-card" style="max-width: 600px; margin: 0 auto;">
-    <h2 style="color: #67432F; font-family: Georgia, serif; margin-bottom: 20px;">Submeter Tarefa</h2>
-    <form asp-action="Submeter" method="post" enctype="multipart/form-data">
+
+<div class="skills-card">
+    <div class="skills-header">
+        <h2 style="color: #67432F; font-family: Georgia, serif; margin: 0; font-size: 1.1rem; font-weight: bold;">
+            <i class="bi bi-upload" style="margin-right: 8px;"></i>
+            Submeter Tarefa
+        </h2>
+    </div>
+    
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin: 15px 0;">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin: 15px 0;">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    
+    <form asp-action="Submeter" method="post" enctype="multipart/form-data" style="padding: 0 24px 24px 24px;">
         @Html.AntiForgeryToken()
         <input type="hidden" asp-for="TarefaId" />
-        <div class="mb-3">
-            <label asp-for="Texto" class="form-label">Texto da Submissão</label>
-            <textarea asp-for="Texto" class="form-control" rows="4" required></textarea>
+        
+        <div style="margin-bottom: 18px;">
+            <label asp-for="Texto" style="color: #67432F; font-size: 1.1rem; font-family: Georgia, serif; font-weight: bold; margin-bottom: 8px; display: block;">
+                Texto da Submissão
+            </label>
+            <textarea asp-for="Texto" class="skills-search" rows="5" placeholder="Descreva o seu trabalho, metodologia utilizada, resultados obtidos..." required style="resize: vertical; min-height: 120px; width: 100%; box-sizing: border-box;"></textarea>
             <span asp-validation-for="Texto" class="text-danger"></span>
         </div>
-        <div class="mb-3">
-            <label class="form-label">Anexar ficheiros (imagens, vídeos, documentos)</label>
-            <input asp-for="Ficheiros" type="file" class="form-control" multiple accept="image/*,video/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt" />
+        
+        <div style="margin-bottom: 18px;">
+            <label style="color: #67432F; font-size: 1.1rem; font-family: Georgia, serif; font-weight: bold; margin-bottom: 8px; display: block;">
+                Anexar Ficheiros
+            </label>
+            <input asp-for="Ficheiros" type="file" class="skills-search" multiple accept="image/*,video/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt" style="padding: 10px 16px; width: 100%; box-sizing: border-box;" />
+            <small class="text-muted" style="display: block; margin-top: 5px; color: #67432F; font-family: Georgia, serif;">
+                <i class="bi bi-info-circle"></i> 
+                Suporta: imagens, vídeos, PDF, Word, PowerPoint, Excel
+            </small>
             <span asp-validation-for="Ficheiros" class="text-danger"></span>
         </div>
-        <div class="d-flex gap-2">
-            <button type="submit" class="skills-modal-submit">SUBMETER</button>
-            <a asp-action="MinhasTarefas" class="skills-modal-cancel">CANCELAR</a>
+        
+        <div asp-validation-summary="All" class="text-danger"></div>
+        
+        <div style="margin-top: 22px; display: flex; gap: 18px;">
+            <button type="submit" class="skills-modal-submit">
+                SUBMETER TAREFA
+            </button>
+            <a asp-action="MinhasTarefas" class="skills-modal-cancel">
+                CANCELAR
+            </a>
         </div>
     </form>
 </div>

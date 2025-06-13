@@ -14,24 +14,24 @@
         <div class="alert alert-danger" style="margin-bottom: 18px;">@ViewBag.Error</div>
     }
     <div class="skills-header">
-        <form id="userSearchForm" method="get" action="/Utilizadores/Index" class="d-flex" style="width:100%;gap:10px;">
-            <input id="searchInput" name="search" type="text" class="skills-search" placeholder="Pesquisar" value="@Context.Request.Query["search"]" autocomplete="off" />
-            <select id="cargoSelect" name="cargo" class="skills-search" style="max-width:180px;">
+        <form id="userSearchForm" method="get" action="/Utilizadores/Index" class="d-flex" style="flex: 1; gap: 10px; margin-right: 15px;">
+            <input id="searchInput" name="search" type="text" class="skills-search" placeholder="Pesquisar" value="@Context.Request.Query["search"]" autocomplete="off" style="flex: 1; min-width: 200px;" />
+            <select id="cargoSelect" name="cargo" class="skills-search" style="width: 180px; flex-shrink: 0;">
                 <option value="Todos" selected="@(cargo == "Todos" ? "selected" : null)">Todos</option>
                 <option value="Aluno" selected="@(cargo == "Aluno" ? "selected" : null)">Aluno</option>
                 <option value="Professor" selected="@(cargo == "Professor" ? "selected" : null)">Professor</option>
                 <option value="Admin" selected="@(cargo == "Admin" ? "selected" : null)">Administrador</option>
             </select>
         </form>
-        <a asp-action="Create" class="skills-add-btn">ADICIONAR UTILIZADOR</a>
+        <a asp-action="Create" class="skills-add-btn" style="flex-shrink: 0;">ADICIONAR UTILIZADOR</a>
     </div>
-    <table class="skills-table">
+    <table class="skills-table" style="width: 100%; table-layout: fixed;">
         <thead>
             <tr>
-                <th class="skills-th">Email</th>
-                <th class="skills-th">UserName</th>
-                <th class="skills-th">Cargo</th>
-                <th class="skills-th skills-th-action">Ação</th>
+                <th class="skills-th" style="width: 35%;">Email</th>
+                <th class="skills-th" style="width: 25%; padding-left: 5px;">UserName</th>
+                <th class="skills-th" style="width: 20%;">Cargo</th>
+                <th class="skills-th skills-th-action" style="width: 20%;">Ação</th>
             </tr>
         </thead>
         <tbody>
@@ -43,10 +43,10 @@
             bool isCurrentUser = user.Id == currentUserId;
             string disableReason = isOnlyActiveAdmin ? "Não é possível desativar o único administrador ativo." : (isCurrentUser ? "Não pode desativar a sua própria conta." : null);
             <tr class="skill-row">
-                <td class="skills-td">@user.Email</td>
-                <td class="skills-td">@user.UserName</td>
-                <td class="skills-td">@(roles.Count > 0 ? roles[0] : "-")</td>
-                <td class="skills-td skills-td-action">
+                <td class="skills-td" style="width: 35%; padding-right: 10px;">@user.Email</td>
+                <td class="skills-td" style="width: 25%; padding-left: 5px; font-weight: 600;">@user.UserName</td>
+                <td class="skills-td" style="width: 20%;">@(roles.Count > 0 ? roles[0] : "-")</td>
+                <td class="skills-td skills-td-action" style="width: 20%;">
                     <form asp-action="AlternarEstado" asp-route-id="@user.Id" method="post" style="display:inline;">
                         <button type="submit" class="skills-remove-btn">@(isLocked ? "ATIVAR" : "DESATIVAR")</button>
                     </form>

@@ -708,10 +708,11 @@ a:hover {
     background: rgba(255,255,255,0.92);
     border-radius: 16px;
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
-    max-width: 900px;
+    max-width: 1100px;
     margin: 40px auto 40px auto;
     padding: 32px 24px 24px 24px;
     font-family: Georgia, serif;
+    overflow-x: auto;
 }
 .skills-header {
     display: flex;
@@ -771,6 +772,8 @@ a:hover {
     border-bottom: 2px solid #e0d6cf;
     background: transparent;
     text-align: left;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 .skills-td {
     color: #67432F;
@@ -779,6 +782,8 @@ a:hover {
     background: transparent;
     vertical-align: middle;
     font-size: 1rem;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 .skill-row:last-child .skills-td {
     border-bottom: none;
@@ -932,11 +937,10 @@ a:hover {
     padding-bottom: 0;
 }
 .skills-td-action {
-    text-align: center;
-    width: 300px;
-    min-width: 280px;
-    max-width: 320px;
+    text-align: left;
     vertical-align: middle;
+    padding: 12px 8px !important;
+    line-height: 32px !important;
 }
 .skills-remove-btn {
     display: inline-block;
@@ -1089,40 +1093,32 @@ a:hover {
     text-decoration: none;
 }
 
-.skills-details-btn {
-    background: #67432F;
-    color: #fff !important;
-    border: none;
-    border-radius: 6px;
-    padding: 6px 8px;
-    font-size: 0.85rem;
-    font-family: Georgia, serif;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.2s;
-    margin-right: 0;
-    text-decoration: none;
-    display: inline-block;
-    box-shadow: 0 2px 6px rgba(103,67,47,0.12);
-    width: 90px;
-    height: 32px;
+.skills-details-btn, .skills-remove-btn {
+    min-width: 120px;
+    max-width: 180px;
+    width: auto;
+    height: 36px;
     text-align: center;
-    line-height: 20px;
+    line-height: 22px;
     vertical-align: middle;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    margin: 0;
+    display: inline-block;
 }
-
-.skills-details-btn:hover {
-    background: #4a2f21;
-    color: #fff !important;
-    text-decoration: none;
+.skills-td-action > div {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 10px !important;
+    justify-content: center !important;
+    align-items: center !important;
 }
 
 /* Ajustar coluna de ação das UCs para acomodar apenas o botão remover */
 .skills-th-action {
     text-align: center;
-    width: 220px;
-    min-width: 200px;
-    max-width: 240px;
+    width: 25%;
     vertical-align: middle;
     padding: 12px 8px !important;
     line-height: 32px !important;
@@ -1130,9 +1126,7 @@ a:hover {
 
 .skills-td-action {
     text-align: center;
-    width: 220px;
-    min-width: 200px;
-    max-width: 240px;
+    width: 25%;
     vertical-align: middle;
     padding: 12px 8px !important;
     line-height: 32px !important;
@@ -1142,9 +1136,7 @@ a:hover {
 .skills-table th:nth-child(2),
 .skills-table td:nth-child(2) {
     text-align: center;
-    width: 120px;
-    min-width: 100px;
-    max-width: 140px;
+    width: 15%;
     font-weight: 600;
 }
 
@@ -1176,11 +1168,10 @@ a:hover {
 /* --- Ajuste da largura da coluna Tarefa --- */
 .skills-table th:first-child,
 .skills-table td:first-child {
-    width: 35%;
-    max-width: 300px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    width: 60%;
+    overflow: visible;
+    white-space: normal;
+    word-break: break-word;
 }
 
 /* --- Customização para pesquisa de tarefas --- */
@@ -1213,24 +1204,47 @@ a:hover {
 }
 
 /* --- Ajustes específicos para a tabela de utilizadores --- */
-/* Remover negrito e garantir uma só linha para todas as células */
+/* Remover negrito e garantir uma só linha para todas as células (exceto Skills) */
 .skills-table .skills-td {
     font-weight: normal !important;
+}
+
+/* Aplicar nowrap para utilizadores e tarefas, mas não para skills */
+body:has([asp-controller="Utilizadores"]) .skills-table .skills-td,
+body:has([asp-controller="Tarefas"]) .skills-table .skills-td {
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
 }
 
-/* --- Ajustes específicos para a página de Skills (UCs) --- */
-/* Mover coluna "Ação" mais para a direita apenas na página de Skills */
+/* Exceção para células de tarefas que precisam de quebra de linha (primeira coluna) */
+body:has([asp-controller="Tarefas"]) .skills-table .skills-td:first-child {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: unset !important;
+    word-break: break-word !important;
+}
+
+/* --- Ajustes específicos para a página de Utilizadores --- */
+body:has([asp-controller="Utilizadores"]) .skills-table th:nth-child(2),
+body:has([asp-controller="Utilizadores"]) .skills-table td:nth-child(2) {
+    padding-left: 8px !important;
+    text-align: left !important;
+}
+
+/* --- Ajustes específicos para a página de Skills --- */
 body:has([asp-controller="Skills"]) .skills-th-action,
 [data-page="skills"] .skills-th-action {
-    padding: 12px 8px 12px 308px !important;
+    text-align: center !important;
+    width: 30% !important;
+    padding: 12px 8px !important;
 }
 
 body:has([asp-controller="Skills"]) .skills-td-action,
 [data-page="skills"] .skills-td-action {
-    padding: 12px 8px 12px 308px !important;
+    text-align: center !important;
+    width: 30% !important;
+    padding: 12px 8px !important;
 }
 
 .skills-td.skill-name {
@@ -1239,16 +1253,17 @@ body:has([asp-controller="Skills"]) .skills-td-action,
   overflow: visible;
   text-overflow: unset;
   display: table-cell;
+  width: 70%;
 }
 
 .skills-th:first-child {
-  width: 80%;
+  width: 70%;
 }
 
 .skills-remove-btn {
-  min-width: 0;
+  min-width: 80px;
   width: auto;
-  max-width: 100px;
+  max-width: 120px;
 }
 
 .skills-table {
@@ -1262,4 +1277,63 @@ body:has([asp-controller="Skills"]) .skills-td-action,
   overflow: visible;
   text-overflow: unset;
   display: table-cell;
+  width: 70%;
+  padding-right: 20px;
+}
+
+/* Ajustes específicos para a página de Skills para garantir visibilidade da coluna Ação */
+body:has([asp-controller="Skills"]) .skills-th:first-child,
+body:has([asp-controller="Skills"]) .skills-td.skill-name,
+[data-page="skills"] .skills-th:first-child,
+[data-page="skills"] .skills-td.skill-name {
+  width: 70% !important;
+}
+
+/* Garantir quebra de linha APENAS para Skills */
+body:has([asp-controller="Skills"]) .skills-table .skills-td.skill-name,
+[data-page="skills"] .skills-table .skills-td.skill-name {
+  white-space: normal !important;
+  word-break: break-word !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+}
+
+.action-btns-vertical {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    width: 100%;
+}
+.action-btns-vertical .skills-details-btn,
+.action-btns-vertical .skills-remove-btn {
+    display: block;
+    width: 160px;
+    min-width: 160px;
+    max-width: 160px;
+    box-sizing: border-box;
+    margin: 0;
+    text-align: center;
+}
+
+.action-btns-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+}
+.action-btns-list li {
+    width: 100%;
+}
+.action-btns-list .skills-details-btn,
+.action-btns-list .skills-remove-btn {
+    width: 160px;
+    min-width: 120px;
+    max-width: 220px;
+    display: block;
+    margin: 0;
+    text-align: center;
 } 
