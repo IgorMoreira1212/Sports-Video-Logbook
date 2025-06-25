@@ -242,11 +242,11 @@ namespace Sports_Video_Logbook.Controllers
                     if (form != null)
                     {
                         // Preencher os campos
-                        if (form.Fields["Nome do Aluno"] is PdfLoadedTextBoxField nomeAlunoField)
+                        if (form.Fields["[NomeAluno]"] is PdfLoadedTextBoxField nomeAlunoField)
                             nomeAlunoField.Text = currentUser.UserName;
-                        if (form.Fields["nome da skill"] is PdfLoadedTextBoxField nomeSkillField)
+                        if (form.Fields["[NomeSkill]"] is PdfLoadedTextBoxField nomeSkillField)
                             nomeSkillField.Text = skill.Nome;
-                        if (form.Fields["nota"] is PdfLoadedTextBoxField notaField)
+                        if (form.Fields["[Nota]"] is PdfLoadedTextBoxField notaField)
                             notaField.Text = melhorNota.ToString("F1");
                     }
                     // Salvar o PDF preenchido

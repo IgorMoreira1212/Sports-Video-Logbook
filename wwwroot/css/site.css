@@ -1336,4 +1336,53 @@ body:has([asp-controller="Skills"]) .skills-table .skills-td.skill-name,
     display: block;
     margin: 0;
     text-align: center;
+}
+
+/* Botão Gerar Certificado redondo e verde */
+.skills-cert-btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 50%;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    max-width: 36px;
+    max-height: 36px;
+    box-shadow: 0 2px 6px rgba(40,167,69,0.12);
+}
+.skills-cert-btn:hover {
+    background-color: #218838;
+    color: white;
+    transform: scale(1.1);
+}
+.skills-cert-btn:active {
+    background-color: #1e7e34;
+    transform: scale(0.95);
+}
+.skills-cert-btn i {
+    font-size: 18px;
+}
+@media (max-width: 768px) {
+    .skills-cert-btn {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        min-height: 32px;
+        max-width: 32px;
+        max-height: 32px;
+        padding: 6px;
+    }
+    .skills-cert-btn i {
+        font-size: 15px;
+    }
 } 
