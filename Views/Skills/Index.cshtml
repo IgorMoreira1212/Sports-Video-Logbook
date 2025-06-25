@@ -5,6 +5,22 @@
 }
 
 <div class="skills-card" data-page="skills">
+    <!-- Mensagens de feedback -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    
     <div class="skills-header" style="display: flex; align-items: center; gap: 16px;">
         <input id="searchSkill" type="text" class="skills-search" placeholder="Pesquisar" style="flex: 1;" />
         @if (User.IsInRole("Admin"))
@@ -22,9 +38,10 @@
                 }
                 else
                 {
-                    <th class="skills-th" style="width: 60%;">Skill Dominada</th>
-                    <th class="skills-th" style="width: 25%; text-align: center;">Melhor Nota</th>
+                    <th class="skills-th" style="width: 50%;">Skill Dominada</th>
+                    <th class="skills-th" style="width: 20%; text-align: center;">Melhor Nota</th>
                     <th class="skills-th" style="width: 15%; text-align: center;">Avaliações</th>
+                    <th class="skills-th" style="width: 15%; text-align: center;">Certificado</th>
                 }
             </tr>
         </thead>
@@ -51,17 +68,24 @@
 
                         string corNota = melhorNota >= 14 ? "#28a745" : (melhorNota >= 9.5 ? "#ffc107" : "#dc3545");
 
-                        <td class="skills-td skill-name" style="width: 60%; white-space: normal; word-break: break-word; padding-right: 20px;">
+                        <td class="skills-td skill-name" style="width: 50%; white-space: normal; word-break: break-word; padding-right: 20px;">
                             <strong>@item.Nome</strong>
                             <br><small class="text-success"><i class="bi bi-check-circle-fill"></i> Skill dominada</small>
                         </td>
-                        <td class="skills-td" style="width: 25%; text-align: center;">
+                        <td class="skills-td" style="width: 20%; text-align: center;">
                             <span style="color: @corNota; font-weight: bold; font-size: 16px;">
                                 @melhorNota.ToString("F1")/20
                             </span>
                         </td>
                         <td class="skills-td" style="width: 15%; text-align: center;">
                             <span class="badge bg-info">@totalAvaliacoes</span>
+                        </td>
+                        <td class="skills-td skills-td-action" style="width: 15%; text-align: center;">
+                            <form asp-action="GerarCertificado" asp-route-id="@item.Id" method="post" style="display:inline;">
+                                <button type="submit" class="skills-cert-btn" onclick="return confirm('Tem certeza que deseja gerar o certificado desta skill?')" title="Gerar Certificado">
+                                    <i class="bi bi-download"></i>
+                                </button>
+                            </form>
                         </td>
                     }
 

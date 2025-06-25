@@ -9,6 +9,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Sports_Video_Logbook.Data;
 using Sports_Video_Logbook.Models;
+using System.IO;
+using iText.Kernel.Pdf;
+using iText.Forms;
+using iText.Forms.Fields;
+using Syncfusion.Pdf;
+using Syncfusion.Pdf.Parsing;
+using Syncfusion.Pdf.Interactive;
 
 namespace Sports_Video_Logbook.Controllers
 {
@@ -203,6 +210,51 @@ namespace Sports_Video_Logbook.Controllers
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        // POST: Skills/GerarCertificado/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Aluno")]
+        public async Task<IActionResult> GerarCertificado(int id)
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null) return Unauthorized();
+
+            var skill = await _context.Skill.FindAsync(id);
+            if (skill == null) return NotFound();
+
+            // Buscar a melhor nota do aluno para a skill
+            var melhorNota = await _context.AvaliacoesSkill
+                .Where(a => a.SkillId == id && a.SubmissaoTarefa.Tarefa.AlunoId == currentUser.Id)
+                .MaxAsync(a => (double?)a.Nota) ?? 0.0;
+
+            var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "pdf", "Certificado.pdf");
+            var outputStream = new MemoryStream();
+
+            using (var templateStream = System.IO.File.OpenRead(templatePath))
+            {
+                // Carregar o PDF
+                using (var loadedDocument = new PdfLoadedDocument(templateStream))
+                {
+                    // Acessar o formulário do PDF
+                    var form = loadedDocument.Form;
+                    if (form != null)
+                    {
+                        // Preencher os campos
+                        if (form.Fields["Nome do Aluno"] is PdfLoadedTextBoxField nomeAlunoField)
+                            nomeAlunoField.Text = currentUser.UserName;
+                        if (form.Fields["nome da skill"] is PdfLoadedTextBoxField nomeSkillField)
+                            nomeSkillField.Text = skill.Nome;
+                        if (form.Fields["nota"] is PdfLoadedTextBoxField notaField)
+                            notaField.Text = melhorNota.ToString("F1");
+                    }
+                    // Salvar o PDF preenchido
+                    loadedDocument.Save(outputStream);
+                }
+            }
+            outputStream.Position = 0;
+            return File(outputStream.ToArray(), "application/pdf", $"Certificado_{skill.Nome}_{currentUser.UserName}.pdf");
         }
 
         private bool SkillExists(int id)
